@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Press+Start+2P&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Reset ───────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #__next {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+/* ─── Minecraft Crosshair ────────────────────────── */
+.mc-crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 20;
+  width: 26px;
+  height: 26px;
+}
+.mc-crosshair::before,
+.mc-crosshair::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.85);
+}
+/* horizontal bar */
+.mc-crosshair::before {
+  width: 100%;
+  height: 2px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  /* gap in center */
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.85) calc(50% - 4px),
+    transparent calc(50% - 4px), transparent calc(50% + 4px),
+    rgba(255,255,255,0.85) calc(50% + 4px), rgba(255,255,255,0.85) 100%
+  );
+}
+/* vertical bar */
+.mc-crosshair::after {
+  width: 2px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.85) calc(50% - 4px),
+    transparent calc(50% - 4px), transparent calc(50% + 4px),
+    rgba(255,255,255,0.85) calc(50% + 4px), rgba(255,255,255,0.85) 100%
+  );
+}
+.mc-crosshair.near {
+  /* turn yellow-green when near a building */
+}
+.mc-crosshair.near::before,
+.mc-crosshair.near::after {
+  /* override colors set via gradient — simpler: just use filter */
+  filter: hue-rotate(60deg) brightness(1.3);
+}
+
+/* ─── Minecraft-style scrollbar ─────────────────── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #1a1a1a; }
+::-webkit-scrollbar-thumb { background: #555; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #888; }
+
+/* ─── Pixel-image rendering for MC textures ─────── */
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* ─── Minecraft button style ─────────────────────── */
+.mc-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  background: #4a4a4a;
+  border: 2px solid;
+  border-color: #acacac #3d3d3d #3d3d3d #acacac;
+  color: #e0e0e0;
+  padding: 8px 14px;
+  cursor: pointer;
+  position: relative;
+  text-shadow: 1px 1px 0 #2a2a2a;
+  letter-spacing: 0.5px;
+  transition: filter 0.1s;
+  user-select: none;
+  image-rendering: pixelated;
+}
+.mc-btn:hover {
+  filter: brightness(1.25);
+  border-color: #cfcfcf #555 #555 #cfcfcf;
+}
+.mc-btn:active {
+  border-color: #3d3d3d #acacac #acacac #3d3d3d;
+  transform: translateY(1px);
+}
+
+/* ─── Minecraft panel ────────────────────────────── */
+.mc-panel {
+  background: rgba(8, 8, 20, 0.92);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05),
+    0 32px 80px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255,255,255,0.07);
+}
+
+/* ─── Tech badge ─────────────────────────────────── */
+.tech-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+/* ─── Animations ─────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
+}
+.animate-fade-in { animation: fadeIn 0.3s ease both; }
+.animate-pulse-glow { animation: pulse-glow 2s infinite; }
+
+/* ─── Loading bar (MC style) ─────────────────────── */
+.mc-progress-track {
+  background: #000;
+  border: 2px solid #555;
+  outline: 1px solid #333;
+}
+.mc-progress-bar {
+  background: linear-gradient(to right, #5DA42E, #8BC34A);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.25);
+}
