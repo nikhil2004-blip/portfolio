@@ -1,0 +1,39 @@
+{
+  "name": "immersive-voxel-portfolio",
+  "version": "1.0.0",
+  "description": "A cinematic first-person 3D portfolio village built with Next.js and Three.js.",
+  "author": "Nikhil Kumar Yadav",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.109.2",
+    "@react-three/fiber": "^8.17.7",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.3.24",
+    "howler": "^2.2.4",
+    "next": "14.2.5",
+    "react": "^18",
+    "react-dom": "^18",
+    "tailwind-merge": "^2.5.2",
+    "three": "^0.167.1",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/howler": "^2.2.11",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/three": "^0.167.2",
+    "autoprefixer": "^10.5.0",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.5",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
