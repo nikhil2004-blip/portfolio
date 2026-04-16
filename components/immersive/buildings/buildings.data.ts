@@ -112,7 +112,20 @@ export const TREE_COLLIDERS: AABB[] = TREES.map(t => ({
   minZ: t.z - 1.2, maxZ: t.z + 1.2
 }));
 
+export const PERIMETER_COLLIDERS: AABB[] = [
+  // North (Negative Z)
+  { minX: -52, maxX: 52, minZ: -51.5, maxZ: -50.5 },
+  // South (Positive Z)
+  { minX: -52, maxX: 52, minZ: 50.5, maxZ: 51.5 },
+  // West (Negative X)
+  { minX: -51.5, maxX: -50.5, minZ: -52, maxZ: 52 },
+  // East (Positive X)
+  { minX: 50.5, maxX: 51.5, minZ: -52, maxZ: 52 },
+];
+
 export const ENVIRONMENT_COLLIDERS: AABB[] = [
   // Add trees
-  ...TREE_COLLIDERS
+  ...TREE_COLLIDERS,
+  // Add perimeter walls
+  ...PERIMETER_COLLIDERS
 ];

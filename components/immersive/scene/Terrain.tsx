@@ -20,35 +20,28 @@ export function Terrain() {
 
   const grassRef = useRef<InstancedMesh>(null);
   const pathRef = useRef<InstancedMesh>(null);
+  const stoneRef = useRef<InstancedMesh>(null);
 
   useLayoutEffect(() => {
-    if (!grassRef.current || !pathRef.current) return;
+    if (!grassRef.current || !pathRef.current || !stoneRef.current) return;
     
     const dummy = new Object3D();
     let grassCount = 0;
     let pathCount = 0;
-    // We can piggy-back on this to add some decorative blocks right on top of the ground
-    // but the references are not defined yet. Let's just fix the paths here.
+    let stoneCount = 0;
 
-    // Generate a 100x100 grid from -50 to +50
+    // 1. Generate Ground (-50 to 50)
     for (let x = -50; x <= 50; x++) {
       for (let z = -50; z <= 50; z++) {
-        // Spine of the village
         const isSpine = Math.abs(x) <= 1 && z >= -25 && z <= 35;
-        
-        // Paths from spine to Row 1 (About/Projects - Doors at z=-18)
         const isPath1 = (z >= -19 && z <= -17) && Math.abs(x) <= 20 && Math.abs(x) > 1;
-        
-        // Paths to Row 2 (Skills/Tools - Doors at z=8)
         const isPath2 = (z >= 7 && z <= 9) && Math.abs(x) <= 20 && Math.abs(x) > 1;
-
-        // Paths to Row 3 (Experience/Contact - Doors at z=28)
         const isPath3 = (z >= 27 && z <= 29) && Math.abs(x) <= 14 && Math.abs(x) > 1;
 
         const isCenterSquare = Math.abs(x) <= 3 && z <= -2 && z >= -8;
         const isRoad = isSpine || isPath1 || isPath2 || isPath3 || isCenterSquare;
         
-        dummy.position.set(x, -0.5, z); // Ground level sits below y=0
+        dummy.position.set(x, -0.5, z);
         dummy.updateMatrix();
 
         if (isRoad) {
@@ -58,17 +51,63 @@ export function Terrain() {
         }
       }
     }
+
+    // 2. Generate Perimeter Fence (-51 and 51)
+    // Post-and-rail design: thin vertical pillars + horizontal bars
+    const placeFenceSection = (x: number, z: number, isVerticalZ: boolean) => {
+      // 2.1 Vertical Post (every 2 blocks)
+      const isPost = (isVerticalZ ? Math.round(z) : Math.round(x)) % 2 === 0;
+      if (isPost) {
+        dummy.position.set(x, 0.6, z); // Center of pillar
+        dummy.scale.set(0.3, 1.2, 0.3); // Thin pillar
+        dummy.updateMatrix();
+        stoneRef.current?.setMatrixAt(stoneCount++, dummy.matrix);
+      }
+
+      // 2.2 Horizontal Rails (every block)
+      // Top rail
+      dummy.position.set(x, 1.0, z);
+      if (isVerticalZ) {
+        dummy.scale.set(0.15, 0.1, 1.0); // Longitudinal on Z
+      } else {
+        dummy.scale.set(1.0, 0.1, 0.15); // Longitudinal on X
+      }
+      dummy.updateMatrix();
+      stoneRef.current?.setMatrixAt(stoneCount++, dummy.matrix);
+
+      // Bottom rail
+      dummy.position.set(x, 0.5, z);
+      dummy.updateMatrix();
+      stoneRef.current?.setMatrixAt(stoneCount++, dummy.matrix);
+      
+      // Reset scale for next operations if any
+      dummy.scale.set(1, 1, 1);
+    };
+
+    // North & South walls (Horizontal bars along X)
+    for (let x = -51; x <= 51; x++) {
+      placeFenceSection(x, -51, false);
+      placeFenceSection(x, 51, false);
+    }
+    // East & West walls (Horizontal bars along Z)
+    for (let z = -50; z <= 50; z++) {
+      placeFenceSection(-51, z, true);
+      placeFenceSection(51, z, true);
+    }
     
     grassRef.current.count = grassCount;
     pathRef.current.count = pathCount;
+    stoneRef.current.count = stoneCount;
+
     grassRef.current.instanceMatrix.needsUpdate = true;
     pathRef.current.instanceMatrix.needsUpdate = true;
+    stoneRef.current.instanceMatrix.needsUpdate = true;
   }, []);
 
   return (
     <group>
       {/* Grass Blocks */}
-      <instancedMesh ref={grassRef} args={[undefined, undefined, 10201]}>
+      <instancedMesh ref={grassRef} args={[undefined, undefined, 11000]}>
         <boxGeometry args={[1, 1, 1]} />
         <meshLambertMaterial attach="material-0" map={grassSide} />
         <meshLambertMaterial attach="material-1" map={grassSide} />
@@ -79,9 +118,15 @@ export function Terrain() {
       </instancedMesh>
 
       {/* Cobblestone Path Blocks */}
-      <instancedMesh ref={pathRef} args={[undefined, undefined, 10201]}>
+      <instancedMesh ref={pathRef} args={[undefined, undefined, 5000]}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshLambertMaterial map={dirt} />
+        <meshLambertMaterial map={cobble} />
+      </instancedMesh>
+
+      {/* Perimeter Fence Blocks (Combined Posts and Rails) */}
+      <instancedMesh ref={stoneRef} args={[undefined, undefined, 3000]}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshLambertMaterial map={cobble} />
       </instancedMesh>
     </group>
   );

@@ -47,22 +47,8 @@ export function HUD() {
           </span>
         </div>
 
-        {/* Right: mute + ESC hint */}
+        {/* Right: ESC hint + Night toggle */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <button
-            onClick={toggleAudio}
-            title={audioEnabled ? 'Mute' : 'Unmute'}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 16,
-              padding: '2px 4px',
-              color: audioEnabled ? '#FFD700' : '#555',
-            }}
-          >
-            {audioEnabled ? '🔊' : '🔇'}
-          </button>
           <button
             onClick={triggerNightMode}
             title={isNight ? 'Switch to Day' : 'Switch to Night'}

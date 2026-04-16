@@ -23,7 +23,7 @@ export function SignModal() {
            setMessage(signToEdit.message);
         }
       } else {
-        setName('');
+        setName('Anonymous');
         setMessage('');
       }
       setStatus('idle');

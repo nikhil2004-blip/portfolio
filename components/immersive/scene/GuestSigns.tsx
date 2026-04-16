@@ -51,7 +51,7 @@ export function GuestSigns() {
                 textAlign="right"
                 anchorY="bottom"
               >
-                {sign.name ? `— ${sign.name}` : ''}
+                {`— ${sign.name || 'Anonymous'}`}
               </Text>
 
               {/* Back Text */}
@@ -76,7 +76,7 @@ export function GuestSigns() {
                 textAlign="right"
                 anchorY="bottom"
               >
-                {sign.name ? `— ${sign.name}` : ''}
+                {`— ${sign.name || 'Anonymous'}`}
               </Text>
             </group>
           </group>

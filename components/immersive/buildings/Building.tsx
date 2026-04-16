@@ -172,6 +172,10 @@ export function Building({ position, size, name, accentColor, id }: Props) {
       for (let x = -1; x <= w; x++) {
           for (let z = -1; z <= d; z++) {
               push(roofBlocks, x, rY, z);
+              // Add industrial 'warning lights' or lanterns on corners
+              if ((x === -1 || x === w) && (z === -1 || z === d)) {
+                  push(lightBlocks, x, rY + 0.3, z);
+              }
           }
       }
   } else {
@@ -203,6 +207,10 @@ export function Building({ position, size, name, accentColor, id }: Props) {
                   
                   if (style === 'medieval' && isSideEdge) {
                       push(stoneBlocks, x, rry, z); // Cobble trim
+                      // Add top lanterns to medieval buildings too
+                      if (isOrientalEdge) {
+                        push(lightBlocks, x, rry - 1, z);
+                      }
                   } else {
                       push(roofBlocks, x, rry, z); // Main roof
                       
@@ -336,12 +344,9 @@ export function Building({ position, size, name, accentColor, id }: Props) {
       interiorCeil.push([x - cx, ceilY, z - cz]);
     }
   }
-  // Corner lanterns inside
-  const li = 2, lj = ceilY - 1;
-  interiorLanterns.push([li - cx, lj, li - cz]);
-  interiorLanterns.push([w - 1 - li - cx, lj, li - cz]);
-  interiorLanterns.push([li - cx, lj, d - 1 - li - cz]);
-  interiorLanterns.push([w - 1 - li - cx, lj, d - 1 - li - cz]);
+  // Single central lantern inside for performance
+  const lj = ceilY - 1;
+  interiorLanterns.push([Math.floor(w/2) - cx, lj, Math.floor(d/2) - cz]);
 
   // Coordinates and Orientation for the top Banner
   let bannerX = 0;
@@ -366,7 +371,7 @@ export function Building({ position, size, name, accentColor, id }: Props) {
   const bannerWidth = name.length * 0.75 + 2.0;
 
   const lightColor = "#fff1a8";
-  const emissiveInt = isNight ? 1.5 : 0;
+  const emissiveInt = isNight ? 2.5 : 0;
 
   return (
     <group position={position}>
@@ -414,7 +419,7 @@ export function Building({ position, size, name, accentColor, id }: Props) {
                 emissiveIntensity={emissiveInt} 
                 toneMapped={false}
             />
-            {isNight && <pointLight intensity={0.8} distance={10} decay={2} color={lightColor} />}
+            {isNight && <pointLight intensity={1.0} distance={8} decay={2} color={lightColor} />}
         </mesh>
       ))}
 
@@ -456,7 +461,7 @@ export function Building({ position, size, name, accentColor, id }: Props) {
             emissiveIntensity={isNight ? 2.5 : 1.0}
             toneMapped={false}
           />
-          <pointLight intensity={isNight ? 1.2 : 0.5} distance={8} decay={2} color="#fff1a8" />
+          <pointLight intensity={isNight ? 1.2 : 0.5} distance={6} decay={2} color="#fff1a8" />
         </mesh>
       ))}
 

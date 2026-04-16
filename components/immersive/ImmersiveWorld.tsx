@@ -58,17 +58,16 @@ export default function ImmersiveWorld() {
         {/* Skybox & Stars */}
         {isNight ? (
           <>
-            {/* Static stars — no per-frame animation (speed=0), low count */}
-            <Stars radius={200} depth={50} count={1500} factor={4} saturation={0} fade={false} speed={0} />
+            <Stars radius={200} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
             <Sky sunPosition={[0, -10, -100]} turbidity={0.1} rayleigh={0.5} />
-            {/* Minimal fireflies — fewer particles, slower, lower cost */}
-            <Sparkles count={150} scale={[120, 20, 120]} size={10} speed={0.1} opacity={0.5} color="#FFE680" position={[0, 10, 0]} />
+            {/* Firefly/Stars particles at night near ground */}
+            <Sparkles count={1000} scale={120} size={12} speed={0.4} opacity={0.6} color="#FFE680" position={[0, 8, 0]} />
           </>
         ) : (
           <>
             <Sky sunPosition={[100, 20, 100]} turbidity={0.1} rayleigh={0.5} />
-            {/* Ambient dust — kept minimal */}
-            <Sparkles count={200} scale={[120, 20, 120]} size={6} speed={0.1} opacity={0.3} color="#FFFFFF" position={[0, 10, 0]} />
+            {/* Ambient dust/pollen particles in day near ground */}
+            <Sparkles count={800} scale={120} size={6} speed={0.3} opacity={0.3} color="#FFFFFF" position={[0, 8, 0]} />
           </>
         )}
         

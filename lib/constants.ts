@@ -10,9 +10,9 @@ export const NEAR     = 0.1;
 export const FAR      = 500;
 
 // ─── World ──────────────────────────────────────────
-export const WORLD_SIZE      = 128; // terrain extent (units)
-export const TEXTURE_REPEAT  = 48;  // grass tiling count across terrain
-export const BOUNDARY_MARGIN = 4;   // how far from edge player is blocked
+export const WORLD_SIZE      = 101; // grass extent is -50 to 50 (101 size)
+export const TEXTURE_REPEAT  = 48;
+export const BOUNDARY_MARGIN = 0.5; // stop at 50 (edge of grass)
 
 // ─── Spawn ──────────────────────────────────────────
 export const SPAWN_X = 0;
