@@ -170,19 +170,22 @@ export function Decorations() {
       {/* Lanterns glowing */}
       <Instances limit={lanternBlocks.length + 10} frustumCulled={false}>
         <boxGeometry args={[0.5, 0.5, 0.5]} />
-        <meshStandardMaterial 
-            color={lanternColor}
-            emissive={lanternColor}
-            emissiveIntensity={emissiveIntensity}
-            toneMapped={false}
-        />
+        <meshLambertMaterial color={lanternColor} />
         {lanternBlocks.map((pos, i) => (
-          <group key={i} position={pos}>
-             <Instance />
-             {isNight && <pointLight distance={10} intensity={2} color="#ffaa00" />}
-          </group>
+          <Instance key={i} position={pos} />
         ))}
       </Instances>
+
+      {/* 4 cheap zone point lights instead of 18 per-lantern lights.
+          They give the same warm glow feeling at a fraction of the GPU cost. */}
+      {isNight && (
+        <>
+          <pointLight position={[0,  3, -18]} distance={22} intensity={3} color="#ffaa00" />
+          <pointLight position={[0,  3,  18]} distance={22} intensity={3} color="#ffaa00" />
+          <pointLight position={[0,  3,  3]}  distance={20} intensity={2.5} color="#ffaa00" />
+          <pointLight position={[0,  3, -8]}  distance={20} intensity={2.5} color="#ffaa00" />
+        </>
+      )}
     </group>
   );
 }
