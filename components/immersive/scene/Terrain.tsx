@@ -27,22 +27,23 @@ export function Terrain() {
     const dummy = new Object3D();
     let grassCount = 0;
     let pathCount = 0;
+    // We can piggy-back on this to add some decorative blocks right on top of the ground
+    // but the references are not defined yet. Let's just fix the paths here.
 
     // Generate a 100x100 grid from -50 to +50
     for (let x = -50; x <= 50; x++) {
       for (let z = -50; z <= 50; z++) {
-        // Define cobblestone paths
         // Spine of the village
-        const isSpine = Math.abs(x) <= 1 && z >= -15 && z <= 35;
+        const isSpine = Math.abs(x) <= 1 && z >= -25 && z <= 35;
         
-        // Paths from spine to Row 1 (About/Projects - Doors at z=-14.5)
-        const isPath1 = (z === -14 || z === -15) && Math.abs(x) <= 20 && Math.abs(x) > 1;
+        // Paths from spine to Row 1 (About/Projects - Doors at z=-18)
+        const isPath1 = (z >= -19 && z <= -17) && Math.abs(x) <= 20 && Math.abs(x) > 1;
         
-        // Paths to Row 2 (Skills/Tools - Doors at z=11/11.5)
-        const isPath2 = (z === 11 || z === 12) && Math.abs(x) <= 20 && Math.abs(x) > 1;
+        // Paths to Row 2 (Skills/Tools - Doors at z=8)
+        const isPath2 = (z >= 7 && z <= 9) && Math.abs(x) <= 20 && Math.abs(x) > 1;
 
-        // Paths to Row 3 (Experience/Contact - Doors at z=31/31.5)
-        const isPath3 = (z === 31 || z === 32) && Math.abs(x) <= 14 && Math.abs(x) > 1;
+        // Paths to Row 3 (Experience/Contact - Doors at z=28)
+        const isPath3 = (z >= 27 && z <= 29) && Math.abs(x) <= 14 && Math.abs(x) > 1;
 
         const isCenterSquare = Math.abs(x) <= 3 && z <= -2 && z >= -8;
         const isRoad = isSpine || isPath1 || isPath2 || isPath3 || isCenterSquare;

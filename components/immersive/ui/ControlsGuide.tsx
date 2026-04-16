@@ -22,14 +22,9 @@ export function ControlsGuide() {
   useEffect(() => {
     if (!hasSeenTutorial) {
       setVisible(true);
-      // Auto-dismiss after 7s
-      const t = setTimeout(() => {
-        setVisible(false);
-        markTutorialSeen();
-      }, 7000);
-      return () => clearTimeout(t);
+      // Removed auto-dismiss so it stays on the side until explicitly closed
     }
-  }, [hasSeenTutorial, markTutorialSeen]);
+  }, [hasSeenTutorial]);
 
   const dismiss = () => {
     setVisible(false);
@@ -46,25 +41,28 @@ export function ControlsGuide() {
           transition={{ duration: 0.3 }}
           style={{
             position: 'fixed',
-            top: 72,
-            right: 16,
+            top: 100,
+            left: 24,
             zIndex: 40,
-            background: 'rgba(0,0,0,0.82)',
-            border: '2px solid rgba(255,255,255,0.15)',
-            borderRadius: 4,
-            padding: '16px 20px',
-            backdropFilter: 'blur(8px)',
-            minWidth: 220,
+            background: 'rgba(0,0,0,0.85)',
+            border: '2px solid rgba(255,255,255,0.2)',
+            borderRadius: 6,
+            padding: '24px 24px',
+            backdropFilter: 'blur(10px)',
+            minWidth: 300,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
           }}
         >
           <div style={{
             fontFamily: "'Press Start 2P', monospace",
-            fontSize: 9,
+            fontSize: 10,
             color: '#FFD700',
-            marginBottom: 14,
+            marginBottom: 20,
             letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+            textAlign: 'center'
           }}>
-            Controls
+            Rules & Controls
           </div>
           {CONTROLS.map(({ key, desc }) => (
             <div
@@ -94,19 +92,23 @@ export function ControlsGuide() {
           <button
             onClick={dismiss}
             style={{
-              marginTop: 12,
+              marginTop: 20,
               width: '100%',
               fontFamily: "'Press Start 2P', monospace",
-              fontSize: 8,
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: 2,
-              color: '#ccc',
-              padding: '6px',
+              fontSize: 10,
+              background: '#FFD700',
+              border: '2px solid #B8860B',
+              borderRadius: 4,
+              color: '#000',
+              padding: '10px',
               cursor: 'pointer',
+              textTransform: 'uppercase',
+              transition: 'transform 0.1s'
             }}
+            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
-            Got it
+            I&apos;m Ready!
           </button>
         </motion.div>
       )}

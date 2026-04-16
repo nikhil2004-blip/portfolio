@@ -4,6 +4,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Monocraft / terminal font shorthand ──────── */
+.font-monocraft {
+  font-family: 'Press Start 2P', 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  line-height: 1.7;
+}
+
+/* ─── Custom scrollbar (for holo panels) ────────── */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
 /* ─── Reset ───────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;

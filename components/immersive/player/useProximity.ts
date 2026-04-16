@@ -40,9 +40,15 @@ export function useProximity() {
         closestDist = dist;
       }
 
-      // AUTO-ENTER: If extremely close (inside the building radius)
+      // Use dynamic auto-enter radius based on building size. 
+      // Made larger so the player easily enters when bumping against the building
+      const maxDim = Math.max(b.size.w, b.size.d) / 2;
+      const autoEnterRadius = maxDim + 2.5; 
+      const autoResetRadius = autoEnterRadius + 1.5;
+
+      // AUTO-ENTER: If extremely close (inside the autoEnter limit)
       // and NOT the building we just closed (unless we moved away and came back)
-      if (dist < 4.2 && closest === b.id && lastClosedBuildingRef.current !== b.id) {
+      if (dist < autoEnterRadius && closest === b.id && lastClosedBuildingRef.current !== b.id) {
           openBuilding(b.id);
           // Release mouse immediately for cinematic entry
           if (document.pointerLockElement) {
@@ -52,7 +58,7 @@ export function useProximity() {
       }
 
       // Reset the "last closed" filter if we moved away from it
-      if (lastClosedBuildingRef.current === b.id && dist > 5) {
+      if (lastClosedBuildingRef.current === b.id && dist > autoResetRadius) {
           lastClosedBuildingRef.current = null;
       }
     }

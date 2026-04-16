@@ -3,23 +3,16 @@ import { Instances, Instance, useTexture } from '@react-three/drei';
 import { NearestFilter } from 'three';
 import { useGameStore } from '@/store/useGameStore';
 
-// ─── Tree positions (scattered around map edges) ──────
-const TREE_POS: [number, number][] = [
-  [-30, -30], [-38, -15], [-35, 5],  [-32, 22],
-  [32,  -28], [38,  -10], [35,  10],  [30,  25],
-  [-25, -45], [0,   -42], [25,  -45],
-  [-40, 35],  [40,  35],  [0,   50],
-  [-20, -50], [20,  -50], [45,  -22],
-];
+import { TREES } from '../buildings/buildings.data';
 
 // ─── Lamp Post positions (Beside paths and spine) ──────
 const LAMP_POS: [number, number][] = [
-  [-4, -17], [4, -17],   // Beside Row 1 path
-  [-12, -17], [12, -17], 
-  [-4, 8], [4, 8],       // Beside Row 2 path
-  [-12, 8], [12, 8],
-  [-4, 28], [4, 28],     // Beside Row 3 path
-  [-10, 28], [10, 28],
+  [-4, -22], [4, -22],   // Beside Row 1 path
+  [-4, -13], [4, -13],
+  [-4, 3], [4, 3],       // Beside Row 2 path
+  [-4, 13], [4, 13],
+  [-4, 23], [4, 23],     // Beside Row 3 path
+  [-4, 33], [4, 33],
   [-3, -3], [3, -3],     // Near center square
   [-3, -7], [3, -7],
 ];
@@ -50,35 +43,73 @@ export function Decorations() {
   const redBlocks: [number, number, number][] = []; 
   const lanternBlocks: [number, number, number][] = [];
 
-  // 1. Voxel Trees
-  TREE_POS.forEach(([tx, tz]) => {
-     // Trunk (y=1 to 5)
-     for (let y = 1; y <= 5; y++) {
-         logBlocks.push([tx, y - 0.5, tz]);
-     }
-     
-     // Leaves layer 1 & 2 (y=3, 4)
-     for (let y = 3; y <= 4; y++) {
+  // 1. Voxel Trees with Variations
+  TREES.forEach(({ x: tx, z: tz, type }) => {
+     if (type === 0) {
+       // Classic Tree
+       for (let y = 1; y <= 5; y++) logBlocks.push([tx, y - 0.5, tz]);
+       for (let y = 3; y <= 4; y++) {
          for (let x = -2; x <= 2; x++) {
-             for (let z = -2; z <= 2; z++) {
-                 // skip corners
-                 if (Math.abs(x) === 2 && Math.abs(z) === 2) continue;
-                 // skip trunk
-                 if (x === 0 && z === 0) continue;
-                 leafBlocks.push([tx + x, y - 0.5, tz + z]);
-             }
-         }
-     }
-     // Leaves layer 3
-     for (let x = -1; x <= 1; x++) {
-         for (let z = -1; z <= 1; z++) {
-             if (Math.abs(x) === 1 && Math.abs(z) === 1) continue;
+           for (let z = -2; z <= 2; z++) {
+             if (Math.abs(x) === 2 && Math.abs(z) === 2) continue;
              if (x === 0 && z === 0) continue;
-             leafBlocks.push([tx + x, 4.5, tz + z]);
+             leafBlocks.push([tx + x, y - 0.5, tz + z]);
+           }
          }
+       }
+       for (let x = -1; x <= 1; x++) {
+         for (let z = -1; z <= 1; z++) {
+           if (Math.abs(x) === 1 && Math.abs(z) === 1) continue;
+           if (x === 0 && z === 0) continue;
+           leafBlocks.push([tx + x, 4.5, tz + z]);
+         }
+       }
+       leafBlocks.push([tx, 5.5, tz], [tx - 1, 5.5, tz], [tx + 1, 5.5, tz], [tx, 5.5, tz - 1], [tx, 5.5, tz + 1]);
+     } else if (type === 1) {
+       // Pine Tree (Taller, thinner)
+       for (let y = 1; y <= 7; y++) logBlocks.push([tx, y - 0.5, tz]);
+       for (let y = 2; y <= 3; y++) {
+         for (let x = -2; x <= 2; x++) {
+           for (let z = -2; z <= 2; z++) {
+             if (Math.abs(x) === 2 || Math.abs(z) === 2) {
+               if (Math.random() > 0.5) continue; // Randomly sparse edges
+             }
+             if (x === 0 && z === 0) continue;
+             leafBlocks.push([tx + x, y - 0.5, tz + z]);
+           }
+         }
+       }
+       for (let y = 4; y <= 5; y++) {
+         for (let x = -1; x <= 1; x++) {
+           for (let z = -1; z <= 1; z++) {
+             if (x === 0 && z === 0) continue;
+             leafBlocks.push([tx + x, y - 0.5, tz + z]);
+           }
+         }
+       }
+       leafBlocks.push([tx, 5.5, tz], [tx - 1, 5.5, tz], [tx + 1, 5.5, tz], [tx, 5.5, tz - 1], [tx, 5.5, tz + 1]);
+       leafBlocks.push([tx, 6.5, tz]);
+       leafBlocks.push([tx, 7.5, tz]);
+     } else if (type === 2) {
+       // Bushy/Round Tree (Shorter, wider)
+       for (let y = 1; y <= 3; y++) logBlocks.push([tx, y - 0.5, tz]);
+       for (let y = 2; y <= 4; y++) {
+         for (let x = -3; x <= 3; x++) {
+           for (let z = -3; z <= 3; z++) {
+             // Make it round
+             if (x * x + z * z >= 8) continue;
+             if (x === 0 && z === 0 && y <= 3) continue;
+             leafBlocks.push([tx + x, y - 0.5, tz + z]);
+           }
+         }
+       }
+       for (let x = -1; x <= 1; x++) {
+         for (let z = -1; z <= 1; z++) {
+           if (Math.abs(x) === 1 && Math.abs(z) === 1) continue;
+           leafBlocks.push([tx + x, 4.5, tz + z]);
+         }
+       }
      }
-     // Leaves layer 4 (top)
-     leafBlocks.push([tx, 5.5, tz], [tx - 1, 5.5, tz], [tx + 1, 5.5, tz], [tx, 5.5, tz - 1], [tx, 5.5, tz + 1]);
   });
 
   // 2. Medieval Lamp Posts

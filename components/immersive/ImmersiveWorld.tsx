@@ -31,26 +31,30 @@ export default function ImmersiveWorld() {
       <HUD />
       <OverlayPanel />
 
-      {/* 3D Canvas */}
-      <Canvas
-        frameloop="always"
-        shadows={false}
-        camera={{ fov: 75, near: 0.1, far: 500 }}
-        style={{ touchAction: 'none' }} // Prevent scrolling on mobile
-        // If overlay is open, we stop rendering new frames to save battery
-        // wait, we handle this differently, cursor lock handles focus
-      >
-        <color attach="background" args={[bgColor]} />
+      {/* 3D Canvas (Lock Target) */}
+      <div id="game-canvas-container" className="absolute inset-0">
+        <Canvas
+          frameloop="always"
+          shadows={false}
+          camera={{ fov: 75, near: 0.1, far: 500 }}
+          style={{ touchAction: 'none' }} // Prevent scrolling on mobile
+        >
+          <color attach="background" args={[bgColor]} />
         
         {/* Skybox & Stars */}
         {isNight ? (
           <>
             <Stars radius={200} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
             <Sky sunPosition={[0, -10, -100]} turbidity={0.1} rayleigh={0.5} />
-            <Sparkles count={800} scale={120} size={10} speed={0.5} opacity={0.6} color="#FFE680" position={[0, 8, 0]} />
+            {/* Firefly/Stars particles at night near ground */}
+            <Sparkles count={1000} scale={[120, 20, 120]} size={12} speed={0.4} opacity={0.6} color="#FFE680" position={[0, 10, 0]} />
           </>
         ) : (
-          <Sky sunPosition={[100, 20, 100]} turbidity={0.1} rayleigh={0.5} />
+          <>
+            <Sky sunPosition={[100, 20, 100]} turbidity={0.1} rayleigh={0.5} />
+            {/* Ambient dust/pollen particles in day near ground */}
+            <Sparkles count={800} scale={[120, 20, 120]} size={6} speed={0.3} opacity={0.3} color="#FFFFFF" position={[0, 10, 0]} />
+          </>
         )}
         
         <Lighting isNight={isNight} />
@@ -74,6 +78,7 @@ export default function ImmersiveWorld() {
         {/* Player (Camera & Movement) */}
         <Player />
       </Canvas>
+      </div>
       
       {/* Mobile fallback / warning */}
       <div className="md:hidden fixed bottom-4 left-4 right-4 bg-black/80 text-white p-4 rounded text-xs text-center z-[100] font-monocraft">

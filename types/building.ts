@@ -8,7 +8,7 @@ export interface AABB {
 export interface BuildingData {
   id: string;
   name: string;
-  emoji: string;
+  Icon: any;
   accentColor: string;
   position: [number, number, number];   // world-space XYZ
   size: { w: number; h: number; d: number };

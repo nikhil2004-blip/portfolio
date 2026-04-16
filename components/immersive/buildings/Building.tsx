@@ -13,6 +13,8 @@ interface Props extends Pick<BuildingData, 'position' | 'size' | 'name' | 'accen
  */
 export function Building({ position, size, name, accentColor, id }: Props) {
   const { w, h, d } = size;
+  const cx = (w - 1) / 2;
+  const cz = (d - 1) / 2;
   const isNight = useGameStore((s) => s.isNight);
 
   const style = (BUILDINGS.find(b => b.id === id)?.style || 'medieval') as 'medieval' | 'japanese' | 'chinese' | 'industrial';
@@ -75,7 +77,7 @@ export function Building({ position, size, name, accentColor, id }: Props) {
   const lightBlocks: [number, number, number][] = [];
 
   const push = (arr: [number, number, number][], x: number, y: number, z: number) => {
-    arr.push([x - (w - 1) / 2, y + 0.5, z - (d - 1) / 2]);
+    arr.push([x - cx, y + 0.5, z - cz]);
   };
 
   // 1. Foundation & Walls & Pillars
@@ -86,17 +88,26 @@ export function Building({ position, size, name, accentColor, id }: Props) {
       if (!(isWallX || isWallZ)) continue;
 
       const isCorner = isWallX && isWallZ;
-      const mid = (w - 1) / 2;
-      const isDoor = z === d - 1 && (
-        w % 2 === 0 
-          ? (x === Math.floor(mid) || x === Math.ceil(mid)) 
-          : (x === mid || x === mid - 1 || x === mid + 1)
-      );
-      
-      const distFromDoor = Math.abs(x - (w - 1) / 2);
-      const isFrontWindow = z === d - 1 && !isDoor && distFromDoor >= 2 && distFromDoor <= w / 2 - 1;
-      const isSideWindow = isWallX && (z === Math.floor((d - 1) / 2) || z === Math.ceil((d - 1) / 2));
-      const isBackWindow = z === 0 && (x === Math.floor((w - 1) / 2) || x === Math.ceil((w - 1) / 2));
+
+      let isDoor = false;
+      const doorFace = position[0] < 0 ? 'px' : 'nx'; // px = positive X, nx = negative X
+
+      if (doorFace === 'px' && x === w - 1) {
+          isDoor = Math.abs(z - cz) <= 1;
+      } else if (doorFace === 'nx' && x === 0) {
+          isDoor = Math.abs(z - cz) <= 1;
+      }
+
+      let isWindowCol = false;
+      if (!isDoor && !isCorner) {
+          if (isWallZ) {
+              const distFromMid = Math.abs(x - cx);
+              isWindowCol = distFromMid === 1 || distFromMid === 2;
+          } else if (isWallX) {
+              const distFromMid = Math.abs(z - cz);
+              isWindowCol = distFromMid === 1 || distFromMid === 2;
+          }
+      }
 
       if (isCorner) {
          push(logBlocks, x, 0, z);
@@ -104,14 +115,23 @@ export function Building({ position, size, name, accentColor, id }: Props) {
          push(stoneBlocks, x, 0, z);
       }
 
+      const midY = Math.floor(h / 2);
       for (let y = 1; y < h - 1; y++) {
          if (isCorner) {
              push(logBlocks, x, y, z);
          } else if (isDoor && y <= 1) {
              // Open entryway
+         } else if (y === midY) {
+             // Second story dividing trim
+             if (style === 'medieval' || style === 'industrial') {
+                 push(stoneBlocks, x, y, z);
+             } else {
+                 push(logBlocks, x, y, z);
+             }
          } else {
-             const isWindow = (y === 1 || y === 2) && (isFrontWindow || isSideWindow || isBackWindow);
-             if (isWindow && !isDoor) {
+             const isWindowY = (y === midY - 1 || y === Math.max(1, midY - 2) || y === midY + 1 || y === midY + 2);
+             
+             if (isWindowCol && isWindowY) {
                  push(glassBlocks, x, y, z);
              } else {
                  push(wallBlocks, x, y, z);
@@ -208,11 +228,47 @@ export function Building({ position, size, name, accentColor, id }: Props) {
       }
   }
 
-  // Entrance Lanterns
-  const midPoint = (w - 1) / 2;
-  const lanternOffset = w % 2 === 0 ? 1.5 : 2;
-  push(lightBlocks, midPoint - lanternOffset, 2, d);
-  push(lightBlocks, midPoint + lanternOffset, 2, d);
+  // Entrance Lanterns and Awning structure
+  const awningZOffset = Math.floor(d / 2) >= 3 ? 2 : 1.5;
+  const lightH = 2; // y=2 is next to door
+
+  // Path extending to walkway
+  const pathBlocks: [number, number, number][] = [];
+  for (let pz = cz - 1; pz <= cz + 1; pz++) {
+      if (position[0] < 0) { // Door at +x side
+          for (let px = w; px <= w + 1; px++) pathBlocks.push([px - cx, -0.49, pz - cz]);
+      } else {
+          for (let px = -2; px < 0; px++) pathBlocks.push([px - cx, -0.49, pz - cz]);
+      }
+  }
+
+  if (position[0] < 0) { // Door at x = w - 1
+      // Wooden pillars for awning
+      push(logBlocks, w, 0, cz - awningZOffset);
+      push(logBlocks, w, 1, cz - awningZOffset);
+      push(logBlocks, w, 0, cz + awningZOffset);
+      push(logBlocks, w, 1, cz + awningZOffset);
+      // Awning roof
+      for(let az = cz - awningZOffset; az <= cz + awningZOffset; az+=0.5) {
+          push(roofBlocks, w, 2, az);
+      }
+      // Lanterns
+      push(lightBlocks, w, lightH, cz - awningZOffset);
+      push(lightBlocks, w, lightH, cz + awningZOffset);
+  } else { // Door at x = 0
+      // Wooden pillars for awning
+      push(logBlocks, -1, 0, cz - awningZOffset);
+      push(logBlocks, -1, 1, cz - awningZOffset);
+      push(logBlocks, -1, 0, cz + awningZOffset);
+      push(logBlocks, -1, 1, cz + awningZOffset);
+      // Awning roof
+      for(let az = cz - awningZOffset; az <= cz + awningZOffset; az+=0.5) {
+          push(roofBlocks, -1, 2, az);
+      }
+      // Lanterns
+      push(lightBlocks, -1, lightH, cz - awningZOffset);
+      push(lightBlocks, -1, lightH, cz + awningZOffset);
+  }
 
   // Chimney
   if (style === 'medieval' && (id === 'about' || id === 'contact')) {
@@ -225,9 +281,46 @@ export function Building({ position, size, name, accentColor, id }: Props) {
     push(stoneBlocks, chX, roofY + 2, chZ);
   }
 
-  // Coordinates for the sign
-  const signY = ty + 0.5;
-  const signZ = (d - 1) / 2 + 1.51;
+  // ── Interior: floor, ceiling, interior lanterns ────────────────────────
+  const interiorFloor: [number,number,number][] = [];
+  const interiorCeil: [number,number,number][] = [];
+  const interiorLanterns: [number,number,number][] = [];
+
+  for (let x = 1; x < w - 1; x++) {
+    for (let z = 1; z < d - 1; z++) {
+      interiorFloor.push([x - cx, 0.05, z - cz]); 
+    }
+  }
+  // Ceiling at floor 1 level (just above head height)
+  const ceilY = Math.floor(h / 2) - 1;
+  for (let x = 1; x < w - 1; x++) {
+    for (let z = 1; z < d - 1; z++) {
+      interiorCeil.push([x - cx, ceilY, z - cz]);
+    }
+  }
+  // Corner lanterns inside
+  const li = 2, lj = ceilY - 1;
+  interiorLanterns.push([li - cx, lj, li - cz]);
+  interiorLanterns.push([w - 1 - li - cx, lj, li - cz]);
+  interiorLanterns.push([li - cx, lj, d - 1 - li - cz]);
+  interiorLanterns.push([w - 1 - li - cx, lj, d - 1 - li - cz]);
+
+  // Coordinates and Orientation for the top Banner
+  let bannerX = 0;
+  let bannerY = Math.floor(h / 2) + 0.6;
+  let bannerZ = 0;
+  let bannerRot: [number, number, number] = [0, 0, 0];
+  
+  // ALL banners face the inner pathway
+  if (position[0] < 0) { // Left-side buildings
+    bannerX = (w - 1) / 2 + 0.52;
+    bannerRot = [0, Math.PI / 2, 0];
+  } else { // Right-side buildings
+    bannerX = -((w - 1) / 2 + 0.52);
+    bannerRot = [0, -Math.PI / 2, 0];
+  }
+
+  const bannerWidth = name.length * 0.75 + 2.0;
 
   const lightColor = "#fff1a8";
   const emissiveInt = isNight ? 1.5 : 0;
@@ -289,23 +382,82 @@ export function Building({ position, size, name, accentColor, id }: Props) {
         {glassBlocks.map((pos, i) => <Instance key={`g${i}`} position={pos} />)}
       </Instances>
 
-      {/* Name Sign mounted on the overhanging log beam */}
-      <mesh position={[0, signY, signZ - 0.1]}>
-        <boxGeometry args={[name.length * 0.35 + 0.5, 0.6, 0.1]} />
-        <meshLambertMaterial map={usePillarTex} color={pillarColor} />
-      </mesh>
-      <Text
-        position={[0, signY, signZ - 0.04]}
-        fontSize={0.34}
-        color={accentColor}
-        font="/fonts/monocraft.ttf"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.02}
-        outlineColor="#000"
-      >
-        {name}
-      </Text>
+      {/* ── Interior Floor (oak planks) */}
+      <Instances limit={interiorFloor.length}>
+        <boxGeometry args={[1, 0.1, 1]} />
+        <meshLambertMaterial map={oakPlankTex} color="#d4a96a" />
+        {interiorFloor.map((pos, i) => <Instance key={`if${i}`} position={pos} />)}
+      </Instances>
+
+      {/* ── Path Blocks (stone) */}
+      <Instances limit={pathBlocks.length}>
+        <boxGeometry args={[1, 0.1, 1]} />
+        <meshLambertMaterial map={stoneTex} />
+        {pathBlocks.map((pos, i) => <Instance key={`path${i}`} position={pos} />)}
+      </Instances>
+
+      {/* ── Interior Ceiling (stone trim) */}
+      <Instances limit={interiorCeil.length}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshLambertMaterial map={stoneBrickTex} color="#cccccc" />
+        {interiorCeil.map((pos, i) => <Instance key={`ic${i}`} position={pos} />)}
+      </Instances>
+
+      {/* ── Interior Lanterns */}
+      {interiorLanterns.map((pos, i) => (
+        <mesh key={`il${i}`} position={pos}>
+          <boxGeometry args={[0.4, 0.4, 0.4]} />
+          <meshStandardMaterial
+            color="#fff1a8"
+            emissive="#fff1a8"
+            emissiveIntensity={isNight ? 2.5 : 1.0}
+            toneMapped={false}
+          />
+          <pointLight intensity={isNight ? 1.2 : 0.5} distance={8} decay={2} color="#fff1a8" />
+        </mesh>
+      ))}
+
+      {/* ── Large Banner attached to the wall */}
+      <group position={[bannerX, bannerY, bannerZ]} rotation={bannerRot}>
+        {/* Backing board — taller and wider than before */}
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[bannerWidth + 1.0, 3.2, 0.25]} />
+          <meshLambertMaterial map={usePillarTex} color={pillarColor} />
+        </mesh>
+        {/* Accent stripe at bottom */}
+        <mesh position={[0, -1.4, 0.13]}>
+          <boxGeometry args={[bannerWidth + 1.0, 0.4, 0.15]} />
+          <meshLambertMaterial color={accentColor} />
+        </mesh>
+        {/* Banner name text */}
+        <Text
+          position={[0, 0.4, 0.14]}
+          fontSize={0.65}
+          color={accentColor}
+          font="/fonts/monocraft.ttf"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.04}
+          outlineColor="#000"
+          maxWidth={bannerWidth - 0.4}
+        >
+          {name}
+        </Text>
+        {/* Subtitle / emoji */}
+        <Text
+          position={[0, -0.7, 0.14]}
+          fontSize={0.3}
+          color="#ffffff"
+          font="/fonts/monocraft.ttf"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.02}
+          outlineColor="#000"
+          fillOpacity={0.7}
+        >
+          [ ENTER ]
+        </Text>
+      </group>
     </group>
   );
 }
