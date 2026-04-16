@@ -10,6 +10,7 @@ import { ToolsPanel } from './panels/ToolsPanel';
 import { ExperiencePanel } from './panels/ExperiencePanel';
 import { LeadershipPanel } from './panels/LeadershipPanel';
 import { ContactPanel } from './panels/ContactPanel';
+import { AnomalyPanel } from './panels/AnomalyPanel';
 
 const BUILDING_LABELS: Record<string, { title: string; subtitle: string; color: string }> = {
   about:      { title: 'PLAYER_PROFILE.EXE', subtitle: 'Identity confirmed. Mostly.', color: '#4ADE80' },
@@ -18,6 +19,7 @@ const BUILDING_LABELS: Record<string, { title: string; subtitle: string; color: 
   tools:      { title: 'TOOLKIT_INDEX.BIN', subtitle: 'The weapons of choice.', color: '#FB923C' },
   leadership: { title: 'GUILD_RECORDS.DAT', subtitle: 'Wins, losses, and the ones we don\'t talk about.', color: '#A78BFA' },
   contact:    { title: 'ESTABLISH_LINK.NET', subtitle: 'Ping sent. Awaiting response.', color: '#F472B6' },
+  anomaly:    { title: '???_ANOMALY.EXE', subtitle: 'You were not supposed to find this.', color: '#FF0044' },
 };
 
 export function OverlayPanel() {
@@ -44,11 +46,10 @@ export function OverlayPanel() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          onClick={(e) => e.nativeEvent.stopPropagation()}
+          onClick={closeBuilding}
           onPointerDown={(e) => e.nativeEvent.stopPropagation()}
           className="absolute inset-0 z-50 flex flex-col cursor-pointer"
           style={{ background: 'rgba(0,0,0,0.97)' }}
-          onClick={closeBuilding}
         >
           {/* Scanline overlay */}
           <div className="absolute inset-0 pointer-events-none" style={{
@@ -128,6 +129,7 @@ export function OverlayPanel() {
             {activeBuilding === 'tools' && <ToolsPanel accentColor={accentColor} />}
             {activeBuilding === 'leadership' && <LeadershipPanel accentColor={accentColor} />}
             {activeBuilding === 'contact' && <ContactPanel accentColor={accentColor} />}
+            {activeBuilding === 'anomaly' && <AnomalyPanel accentColor={accentColor} />}
           </motion.div>
 
           {/* Bottom HUD bar */}

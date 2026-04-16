@@ -4,12 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/useGameStore';
 
 const CONTROLS = [
-  { key: 'W A S D',    desc: 'Move' },
-  { key: 'Mouse',      desc: 'Look around' },
-  { key: 'Shift',      desc: 'Sprint' },
-  { key: 'E',          desc: 'Enter building' },
-  { key: 'ESC',        desc: 'Close / release cursor' },
-  { key: 'M',          desc: 'Toggle minimap' },
+  { key: 'W A S D',    desc: 'Move (like every game since 1996)' },
+  { key: 'Mouse',      desc: 'Look around and judge my design choices' },
+  { key: 'Shift',      desc: 'Sprint (for when HR gives you 30 seconds)' },
+  { key: 'E',          desc: 'Enter buildings to see my actual work' },
+  { key: 'ESC',        desc: 'Release your cursor from my hostage situation' },
+  { key: 'M',          desc: 'Toggle minimap (if you somehow get lost)' },
+  { key: '1-7',        desc: 'Select hotbar item (yes, there is an inventory)' },
+  { key: 'Right Click',desc: 'Place signboard and leave a message!' }
 ];
 
 /**
@@ -60,9 +62,10 @@ export function ControlsGuide() {
             marginBottom: 20,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            textAlign: 'center'
+            textAlign: 'center',
+            lineHeight: '1.4'
           }}>
-            Rules & Controls
+            Welcome to Nikhil&apos;s<br />Over-Engineered Portfolio
           </div>
           {CONTROLS.map(({ key, desc }) => (
             <div

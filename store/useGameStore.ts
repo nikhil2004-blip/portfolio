@@ -15,6 +15,9 @@ interface GameState {
   overlayOpen: boolean;
   isNight: boolean;
 
+  isTransitioningNight: boolean;
+  hasToggledNight: boolean;
+
   // ── player prefs ────────────────────────────────
   hasSeenTutorial: boolean;
   audioEnabled: boolean;
@@ -30,6 +33,7 @@ interface GameState {
   openBuilding: (id: string) => void;
   closeBuilding: () => void;
   toggleNight: () => void;
+  triggerNightMode: () => void;
   markTutorialSeen: () => void;
   toggleAudio: () => void;
   toggleMinimap: () => void;
@@ -49,6 +53,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   activeBuilding: null,
   overlayOpen: false,
   isNight: false,
+  isTransitioningNight: false,
+  hasToggledNight: false,
   hasSeenTutorial: false,
   audioEnabled: false,
   minimapVisible: false,
@@ -68,6 +74,23 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   toggleNight: () =>
     set((s) => ({ isNight: !s.isNight })),
+
+  triggerNightMode: () => {
+    const { hasToggledNight, isNight } = get();
+    // Only show loading screen on the first switch to night.
+    if (!hasToggledNight && !isNight) {
+      set({ isTransitioningNight: true });
+      // Allow the DOM/React to render the loading screen, then flip night mode,
+      // which will synchronously freeze the browser while compiling shaders.
+      setTimeout(() => {
+        set({ isNight: true, hasToggledNight: true });
+        // The browser will freeze here. Once it unfreezes, wait a bit and dismiss the loading screen.
+        setTimeout(() => set({ isTransitioningNight: false }), 500);
+      }, 50);
+    } else {
+      get().toggleNight();
+    }
+  },
 
   markTutorialSeen: () => set({ hasSeenTutorial: true }),
 

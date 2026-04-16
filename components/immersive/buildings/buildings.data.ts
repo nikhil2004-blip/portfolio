@@ -1,5 +1,5 @@
 import type { BuildingData, AABB } from '@/types/building';
-import { User, Archive, Cpu, Wrench, Trophy, Mail } from 'lucide-react';
+import { User, Archive, Cpu, Wrench, Trophy, Mail, AlertTriangle } from 'lucide-react';
 
 export const BUILDINGS: BuildingData[] = [
   {
@@ -74,6 +74,18 @@ export const BUILDINGS: BuildingData[] = [
     doorSide: 'south',
     style: 'medieval',
   },
+  {
+    id: 'anomaly',
+    name: '???',
+    Icon: AlertTriangle,
+    accentColor: '#FF0044',
+    position: [0, 0, -5],
+    size: { w: 7, h: 9, d: 7 },
+    triggerRadius: 5.5,
+    collider: { minX: -3.5, maxX: 3.5, minZ: -8.5, maxZ: -1.5 },
+    doorSide: 'south',
+    style: 'industrial',
+  },
 ];
 
 export const TREES: { x: number; z: number; type: number }[] = [
@@ -101,8 +113,6 @@ export const TREE_COLLIDERS: AABB[] = TREES.map(t => ({
 }));
 
 export const ENVIRONMENT_COLLIDERS: AABB[] = [
-  // Grand Monument Pagoda Base (centered at 0, -5, size 5x5)
-  { minX: -2.5, maxX: 2.5, minZ: -7.5, maxZ: -2.5 },
   // Add trees
   ...TREE_COLLIDERS
 ];

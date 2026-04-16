@@ -36,11 +36,9 @@ export function Decorations() {
   // Generate Voxel arrays
   const logBlocks: [number, number, number][] = [];
   const leafBlocks: [number, number, number][] = [];
-  const stoneBlocks: [number, number, number][] = [];
-  const woodBlocks: [number, number, number][] = []; 
   const poleBlocks: [number, number, number][] = []; 
   const armBlocks: [number, number, number][] = []; 
-  const redBlocks: [number, number, number][] = []; 
+  const stoneBlocks: [number, number, number][] = [];
   const lanternBlocks: [number, number, number][] = [];
 
   // 1. Voxel Trees with Variations
@@ -124,61 +122,8 @@ export function Decorations() {
       lanternBlocks.push([lx, 2.5, lz]);
   });
 
-  // 3. Grand Monument Pagoda (at 0, 0, -5)
-  const wx = 0;
-  const wz = -5;
-  
-  // Base 5x5
-  for (let y = 1; y <= 2; y++) {
-    for (let x = -2; x <= 2; x++) {
-      for (let z = -2; z <= 2; z++) {
-        stoneBlocks.push([wx + x, y - 0.5, wz + z]);
-      }
-    }
-  }
-  // Tier 2 3x3
-  for (let y = 3; y <= 5; y++) {
-    for (let x = -1; x <= 1; x++) {
-      for (let z = -1; z <= 1; z++) {
-        stoneBlocks.push([wx + x, y - 0.5, wz + z]);
-      }
-    }
-  }
-  
-  // Pillars for roof corners
-  for (let y = 3; y <= 4; y++) {
-      woodBlocks.push([wx - 2, y - 0.5, wz - 2]);
-      woodBlocks.push([wx + 2, y - 0.5, wz - 2]);
-      woodBlocks.push([wx - 2, y - 0.5, wz + 2]);
-      woodBlocks.push([wx + 2, y - 0.5, wz + 2]);
-  }
 
-  // Roof Tier 1 (7x7) extending out
-  for (let x = -3; x <= 3; x++) {
-    for (let z = -3; z <= 3; z++) {
-      if (Math.abs(x) <= 1 && Math.abs(z) <= 1) continue; // hollow inner
-      redBlocks.push([wx + x, 4.5, wz + z]);
-    }
-  }
-  
-  // Roof Tier 2 (3x3 on top of tier 2)
-  for (let x = -1; x <= 1; x++) {
-    for (let z = -1; z <= 1; z++) {
-      redBlocks.push([wx + x, 5.5, wz + z]);
-    }
-  }
-  // Spire
-  redBlocks.push([wx, 6.5, wz]);
-  redBlocks.push([wx, 7.5, wz]);
 
-  // Lantern blocks at the corners
-  lanternBlocks.push(
-    [wx - 3, 3.5, wz - 3],
-    [wx + 3, 3.5, wz - 3],
-    [wx - 3, 3.5, wz + 3],
-    [wx + 3, 3.5, wz + 3],
-    [wx, 8.5, wz] // the very top
-  );
 
   return (
     <group>
@@ -201,18 +146,11 @@ export function Decorations() {
         {leafBlocks.map((pos, i) => <Instance key={i} position={pos} />)}
       </Instances>
 
-      {/* Monument Stone */}
-      <Instances limit={stoneBlocks.length + 20} frustumCulled={false}>
+      {/* Bases for Lamp Posts */}
+      <Instances limit={stoneBlocks.length + 10} frustumCulled={false}>
         <boxGeometry args={[1, 1, 1]} />
         <meshLambertMaterial map={stoneTex} />
         {stoneBlocks.map((pos, i) => <Instance key={i} position={pos} />)}
-      </Instances>
-
-      {/* Monument Pillars */}
-      <Instances limit={woodBlocks.length + 10} frustumCulled={false}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshLambertMaterial color="#4A3B2A" />
-        {woodBlocks.map((pos, i) => <Instance key={i} position={pos} />)}
       </Instances>
 
       {/* Thin Poles for Lamp Posts */}
@@ -227,13 +165,6 @@ export function Decorations() {
         <boxGeometry args={[0.6, 0.1, 0.1]} />
         <meshLambertMaterial color="#3B2A1A" />
         {armBlocks.map((pos, i) => <Instance key={i} position={pos} />)}
-      </Instances>
-
-      {/* Monument Roof */}
-      <Instances limit={redBlocks.length + 20} frustumCulled={false}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshLambertMaterial color="#8B2020" />
-        {redBlocks.map((pos, i) => <Instance key={i} position={pos} />)}
       </Instances>
 
       {/* Lanterns glowing */}

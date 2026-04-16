@@ -90,12 +90,14 @@ export function Building({ position, size, name, accentColor, id }: Props) {
       const isCorner = isWallX && isWallZ;
 
       let isDoor = false;
-      const doorFace = position[0] < 0 ? 'px' : 'nx'; // px = positive X, nx = negative X
+      const doorFace = id === 'anomaly' ? 'pz' : (position[0] < 0 ? 'px' : 'nx'); // px = positive X, nx = negative X, pz = positive Z (south)
 
       if (doorFace === 'px' && x === w - 1) {
           isDoor = Math.abs(z - cz) <= 1;
       } else if (doorFace === 'nx' && x === 0) {
           isDoor = Math.abs(z - cz) <= 1;
+      } else if (doorFace === 'pz' && z === d - 1) {
+          isDoor = Math.abs(x - cx) <= 1;
       }
 
       let isWindowCol = false;
@@ -230,19 +232,29 @@ export function Building({ position, size, name, accentColor, id }: Props) {
 
   // Entrance Lanterns and Awning structure
   const awningZOffset = Math.floor(d / 2) >= 3 ? 2 : 1.5;
+  const awningXOffset = Math.floor(w / 2) >= 3 ? 2 : 1.5;
   const lightH = 2; // y=2 is next to door
+
+  const doorFace = id === 'anomaly' ? 'pz' : (position[0] < 0 ? 'px' : 'nx');
 
   // Path extending to walkway
   const pathBlocks: [number, number, number][] = [];
-  for (let pz = cz - 1; pz <= cz + 1; pz++) {
-      if (position[0] < 0) { // Door at +x side
-          for (let px = w; px <= w + 1; px++) pathBlocks.push([px - cx, -0.49, pz - cz]);
-      } else {
-          for (let px = -2; px < 0; px++) pathBlocks.push([px - cx, -0.49, pz - cz]);
+  
+  if (doorFace === 'px' || doorFace === 'nx') {
+      for (let pz = cz - 1; pz <= cz + 1; pz++) {
+          if (doorFace === 'px') { // Door at +x side
+              for (let px = w; px <= w + 1; px++) pathBlocks.push([px - cx, -0.49, pz - cz]);
+          } else {
+              for (let px = -2; px < 0; px++) pathBlocks.push([px - cx, -0.49, pz - cz]);
+          }
+      }
+  } else if (doorFace === 'pz') {
+      for (let px = cx - 1; px <= cx + 1; px++) {
+          for (let pz = d; pz <= d + 1; pz++) pathBlocks.push([px - cx, -0.49, pz - cz]);
       }
   }
 
-  if (position[0] < 0) { // Door at x = w - 1
+  if (doorFace === 'px') { // Door at x = w - 1
       // Wooden pillars for awning
       push(logBlocks, w, 0, cz - awningZOffset);
       push(logBlocks, w, 1, cz - awningZOffset);
@@ -255,7 +267,7 @@ export function Building({ position, size, name, accentColor, id }: Props) {
       // Lanterns
       push(lightBlocks, w, lightH, cz - awningZOffset);
       push(lightBlocks, w, lightH, cz + awningZOffset);
-  } else { // Door at x = 0
+  } else if (doorFace === 'nx') { // Door at x = 0
       // Wooden pillars for awning
       push(logBlocks, -1, 0, cz - awningZOffset);
       push(logBlocks, -1, 1, cz - awningZOffset);
@@ -268,6 +280,16 @@ export function Building({ position, size, name, accentColor, id }: Props) {
       // Lanterns
       push(lightBlocks, -1, lightH, cz - awningZOffset);
       push(lightBlocks, -1, lightH, cz + awningZOffset);
+  } else if (doorFace === 'pz') { // Door at z = d - 1
+      push(logBlocks, cx - awningXOffset, 0, d);
+      push(logBlocks, cx - awningXOffset, 1, d);
+      push(logBlocks, cx + awningXOffset, 0, d);
+      push(logBlocks, cx + awningXOffset, 1, d);
+      for(let ax = cx - awningXOffset; ax <= cx + awningXOffset; ax+=0.5) {
+          push(roofBlocks, ax, 2, d);
+      }
+      push(lightBlocks, cx - awningXOffset, lightH, d);
+      push(lightBlocks, cx + awningXOffset, lightH, d);
   }
 
   // Chimney
@@ -311,13 +333,15 @@ export function Building({ position, size, name, accentColor, id }: Props) {
   let bannerZ = 0;
   let bannerRot: [number, number, number] = [0, 0, 0];
   
-  // ALL banners face the inner pathway
-  if (position[0] < 0) { // Left-side buildings
+  if (doorFace === 'px') { 
     bannerX = (w - 1) / 2 + 0.52;
     bannerRot = [0, Math.PI / 2, 0];
-  } else { // Right-side buildings
+  } else if (doorFace === 'nx') { 
     bannerX = -((w - 1) / 2 + 0.52);
     bannerRot = [0, -Math.PI / 2, 0];
+  } else if (doorFace === 'pz') { // Front facing
+    bannerZ = (d - 1) / 2 + 0.52;
+    bannerRot = [0, 0, 0];
   }
 
   const bannerWidth = name.length * 0.75 + 2.0;
