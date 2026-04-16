@@ -7,7 +7,7 @@ function generateId(): string {
 }
 
 export function SignModal() {
-  const { signboardOpen, setSignboardOpen, visitorId, visitorSigns, addSign } = useGameStore();
+  const { signboardOpen, setSignboardOpen, visitorId, visitorSigns, addSign, updateSign, editingSignId } = useGameStore();
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -16,11 +16,21 @@ export function SignModal() {
 
   useEffect(() => {
     if (signboardOpen) {
+      if (editingSignId) {
+        const signToEdit = visitorSigns.find(s => s.id === editingSignId);
+        if (signToEdit) {
+           setName(signToEdit.name !== 'Anonymous' ? signToEdit.name : '');
+           setMessage(signToEdit.message);
+        }
+      } else {
+        setName('');
+        setMessage('');
+      }
       setStatus('idle');
       setErrorText('');
       setTimeout(() => nameRef.current?.focus(), 50);
     }
-  }, [signboardOpen]);
+  }, [signboardOpen, editingSignId, visitorSigns]);
 
   if (!signboardOpen) return null;
 
@@ -35,26 +45,35 @@ export function SignModal() {
     if (!canSubmit) return;
     setStatus('loading');
 
-    const sign: GuestSign = {
-      id: generateId(),
-      name: name.trim() || 'Anonymous',
-      message: message.trim(),
-      slot: nextSlot,
-      placedAt: new Date().toISOString(),
-    };
+    const finalName = name.trim() || 'Anonymous';
+    const finalMessage = message.trim();
 
-    // Save to localStorage immediately (source of truth)
-    addSign(sign);
-
-    // Fire-and-forget GitHub notification
-    try {
-      fetch('/api/sign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ visitorId, name: sign.name, message: sign.message, slot: sign.slot }),
-      }).catch(() => {});
-    } catch {
-      // silent — localStorage already saved
+    if (editingSignId) {
+       updateSign(editingSignId, { name: finalName, message: finalMessage });
+       // Also notify GitHub logic optionally
+       try {
+         fetch('/api/sign', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ visitorId, name: finalName, message: finalMessage, slot: visitorSigns.find(s=>s.id === editingSignId)?.slot || 1 }),
+         }).catch(() => {});
+       } catch {}
+    } else {
+       const sign: GuestSign = {
+         id: generateId(),
+         name: finalName,
+         message: finalMessage,
+         slot: nextSlot,
+         placedAt: new Date().toISOString(),
+       };
+       addSign(sign);
+       try {
+         fetch('/api/sign', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ visitorId, name: sign.name, message: sign.message, slot: sign.slot }),
+         }).catch(() => {});
+       } catch {}
     }
 
     setStatus('success');

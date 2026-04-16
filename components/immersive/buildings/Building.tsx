@@ -98,6 +98,8 @@ export function Building({ position, size, name, accentColor, id }: Props) {
           isDoor = Math.abs(z - cz) <= 1;
       } else if (doorFace === 'pz' && z === d - 1) {
           isDoor = Math.abs(x - cx) <= 1;
+      } else if (doorFace === 'nz' && z === 0) {
+          isDoor = Math.abs(x - cx) <= 1;
       }
 
       let isWindowCol = false;
@@ -235,7 +237,7 @@ export function Building({ position, size, name, accentColor, id }: Props) {
   const awningXOffset = Math.floor(w / 2) >= 3 ? 2 : 1.5;
   const lightH = 2; // y=2 is next to door
 
-  const doorFace = id === 'anomaly' ? 'pz' : (position[0] < 0 ? 'px' : 'nx');
+  const doorFace = id === 'anomaly' ? 'nz' : (position[0] < 0 ? 'px' : 'nx');
 
   // Path extending to walkway
   const pathBlocks: [number, number, number][] = [];
@@ -251,6 +253,10 @@ export function Building({ position, size, name, accentColor, id }: Props) {
   } else if (doorFace === 'pz') {
       for (let px = cx - 1; px <= cx + 1; px++) {
           for (let pz = d; pz <= d + 1; pz++) pathBlocks.push([px - cx, -0.49, pz - cz]);
+      }
+  } else if (doorFace === 'nz') {
+      for (let px = cx - 1; px <= cx + 1; px++) {
+          for (let pz = -2; pz < 0; pz++) pathBlocks.push([px - cx, -0.49, pz - cz]);
       }
   }
 
@@ -290,6 +296,16 @@ export function Building({ position, size, name, accentColor, id }: Props) {
       }
       push(lightBlocks, cx - awningXOffset, lightH, d);
       push(lightBlocks, cx + awningXOffset, lightH, d);
+  } else if (doorFace === 'nz') { // Door at z = 0
+      push(logBlocks, cx - awningXOffset, 0, -1);
+      push(logBlocks, cx - awningXOffset, 1, -1);
+      push(logBlocks, cx + awningXOffset, 0, -1);
+      push(logBlocks, cx + awningXOffset, 1, -1);
+      for(let ax = cx - awningXOffset; ax <= cx + awningXOffset; ax+=0.5) {
+          push(roofBlocks, ax, 2, -1);
+      }
+      push(lightBlocks, cx - awningXOffset, lightH, -1);
+      push(lightBlocks, cx + awningXOffset, lightH, -1);
   }
 
   // Chimney
@@ -339,9 +355,12 @@ export function Building({ position, size, name, accentColor, id }: Props) {
   } else if (doorFace === 'nx') { 
     bannerX = -((w - 1) / 2 + 0.52);
     bannerRot = [0, -Math.PI / 2, 0];
-  } else if (doorFace === 'pz') { // Front facing
+  } else if (doorFace === 'pz') { 
     bannerZ = (d - 1) / 2 + 0.52;
     bannerRot = [0, 0, 0];
+  } else if (doorFace === 'nz') { // Front facing towards camera origin
+    bannerZ = -((d - 1) / 2 + 0.52);
+    bannerRot = [0, Math.PI, 0];
   }
 
   const bannerWidth = name.length * 0.75 + 2.0;

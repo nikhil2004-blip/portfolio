@@ -12,7 +12,7 @@ const BLOCKS = [
 ];
 
 export function Inventory() {
-  const { overlayOpen, visitorSigns, setSignboardOpen } = useGameStore();
+  const { overlayOpen, visitorSigns, activeSlot, setActiveSlot } = useGameStore();
 
   if (overlayOpen) return null;
 
@@ -37,25 +37,31 @@ export function Inventory() {
       }}
     >
       {/* Decorative blocks — visual only */}
-      {BLOCKS.map((block, i) => (
-        <div
-          key={i}
-          title={block.title}
-          style={{
-            width: 44,
-            height: 44,
-            background: block.color,
-            border: '2px solid rgba(0,0,0,0.6)',
-            outline: '1px solid rgba(255,255,255,0.1)',
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'flex-end',
-            padding: 2,
-            boxSizing: 'border-box',
-            position: 'relative',
-            cursor: 'default',
-          }}
-        >
+      {BLOCKS.map((block, i) => {
+        const isActive = activeSlot === i;
+        return (
+          <div
+            key={i}
+            title={block.title}
+            onClick={() => setActiveSlot(i)}
+            style={{
+              width: 44,
+              height: 44,
+              background: block.color,
+              border: isActive ? '3px solid white' : '2px solid rgba(0,0,0,0.6)',
+              outline: isActive ? '1px solid black' : '1px solid rgba(255,255,255,0.1)',
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'flex-end',
+              padding: 2,
+              boxSizing: 'border-box',
+              position: 'relative',
+              cursor: 'pointer',
+              transform: isActive ? 'scale(1.05)' : 'scale(1)',
+              transition: 'transform 0.1s',
+            }}
+          >
+
           {/* Pixel highlight top-left */}
           <div style={{
             position: 'absolute',
@@ -81,22 +87,28 @@ export function Inventory() {
           }}>
             {block.label}
           </span>
-        </div>
-      ))}
+          </div>
+        );
+      })}
 
       {/* Separator */}
       <div style={{ width: 2, background: 'rgba(255,255,255,0.1)', margin: '4px 2px' }} />
 
-      {/* Signboard slot */}
+      {/* Signboard slot - index 7 */}
       <div
-        onClick={canPlace ? () => setSignboardOpen(true) : undefined}
-        title={canPlace ? 'Place a Sign (click to open)' : 'Max signs placed (2/2)'}
+        onClick={() => setActiveSlot(7)}
+        title={canPlace ? 'Signboard (Click to equip, place with left click)' : 'Max signs placed (2/2)'}
         style={{
           width: 52,
           height: 44,
           background: canPlace ? '#5C3D1E' : '#2A2A2A',
-          border: `2px solid ${canPlace ? 'rgba(200,150,80,0.8)' : 'rgba(80,80,80,0.5)'}`,
-          outline: canPlace ? '1px solid rgba(255,200,100,0.3)' : '1px solid transparent',
+          border: activeSlot === 7 
+            ? '3px solid white' 
+            : `2px solid ${canPlace ? 'rgba(200,150,80,0.8)' : 'rgba(80,80,80,0.5)'}`,
+          outline: activeSlot === 7 
+            ? '1px solid black' 
+            : (canPlace ? '1px solid rgba(255,200,100,0.3)' : '1px solid transparent'),
+          transform: activeSlot === 7 ? 'scale(1.05)' : 'scale(1)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',

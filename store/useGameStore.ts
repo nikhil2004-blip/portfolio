@@ -4,7 +4,8 @@ export interface GuestSign {
   id: string;
   name: string;
   message: string;
-  slot: 1 | 2;
+  position: [number, number, number];
+  rotationY: number;
   placedAt: string;
 }
 
@@ -27,6 +28,8 @@ interface GameState {
   visitorId: string;
   visitorSigns: GuestSign[];
   signboardOpen: boolean;
+  editingSignId: string | null;
+  activeSlot: number;
 
   // ── actions ─────────────────────────────────────
   setNearbyBuilding: (id: string | null) => void;
@@ -34,6 +37,7 @@ interface GameState {
   closeBuilding: () => void;
   toggleNight: () => void;
   triggerNightMode: () => void;
+  _setNightAndFinish: () => void;
   markTutorialSeen: () => void;
   toggleAudio: () => void;
   toggleMinimap: () => void;
@@ -41,7 +45,10 @@ interface GameState {
   // ── guestbook actions ─────────────────────────────
   initVisitor: () => void;
   addSign: (sign: GuestSign) => void;
-  setSignboardOpen: (v: boolean) => void;
+  removeSign: (id: string) => void;
+  updateSign: (id: string, updates: Partial<GuestSign>) => void;
+  setSignboardOpen: (isOpen: boolean, signId?: string | null) => void;
+  setActiveSlot: (slot: number) => void;
 }
 
 function generateId(): string {
@@ -63,6 +70,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   visitorId: '',
   visitorSigns: [],
   signboardOpen: false,
+  editingSignId: null,
+  activeSlot: 0,
 
   setNearbyBuilding: (id) => set({ nearbyBuilding: id }),
 
@@ -79,17 +88,21 @@ export const useGameStore = create<GameState>((set, get) => ({
     const { hasToggledNight, isNight } = get();
     // Only show loading screen on the first switch to night.
     if (!hasToggledNight && !isNight) {
+      // Just set the flag — the NightTransitionScreen component will
+      // use a double-rAF to guarantee a paint BEFORE flipping isNight
+      // (which freezes the browser while compiling WebGL shaders).
       set({ isTransitioningNight: true });
-      // Allow the DOM/React to render the loading screen, then flip night mode,
-      // which will synchronously freeze the browser while compiling shaders.
-      setTimeout(() => {
-        set({ isNight: true, hasToggledNight: true });
-        // The browser will freeze here. Once it unfreezes, wait a bit and dismiss the loading screen.
-        setTimeout(() => set({ isTransitioningNight: false }), 500);
-      }, 50);
     } else {
       get().toggleNight();
     }
+  },
+
+  // Called by NightTransitionScreen after it has confirmed a browser paint
+  _setNightAndFinish: () => {
+    set({ isNight: true, hasToggledNight: true });
+    // After setting isNight, the browser will freeze to compile shaders.
+    // Once it unfreezes, we wait briefly then dismiss the screen.
+    setTimeout(() => set({ isTransitioningNight: false }), 800);
   },
 
   markTutorialSeen: () => set({ hasSeenTutorial: true }),
@@ -125,18 +138,32 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   addSign: (sign) => {
     const current = get().visitorSigns;
-    // Replace if same slot, otherwise append
-    const updated = current.some(s => s.slot === sign.slot)
-      ? current.map(s => s.slot === sign.slot ? sign : s)
-      : [...current, sign];
-
-    // Persist to localStorage
+    const updated = [...current, sign];
     if (typeof window !== 'undefined') {
       localStorage.setItem('portfolio_signs', JSON.stringify(updated));
     }
-
     set({ visitorSigns: updated });
   },
 
-  setSignboardOpen: (v) => set({ signboardOpen: v }),
+  removeSign: (id) => {
+    const current = get().visitorSigns;
+    const updated = current.filter(s => s.id !== id);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('portfolio_signs', JSON.stringify(updated));
+    }
+    set({ visitorSigns: updated });
+  },
+
+  updateSign: (id, updates) => {
+    const current = get().visitorSigns;
+    const updated = current.map(s => s.id === id ? { ...s, ...updates } : s);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('portfolio_signs', JSON.stringify(updated));
+    }
+    set({ visitorSigns: updated });
+  },
+
+  setSignboardOpen: (isOpen, signId = null) => set({ signboardOpen: isOpen, editingSignId: signId }),
+  
+  setActiveSlot: (slot) => set({ activeSlot: slot }),
 }));

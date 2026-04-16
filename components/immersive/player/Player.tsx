@@ -4,7 +4,8 @@ import { PointerLockControls } from '@react-three/drei';
 import { useKeyboard } from './useKeyboard';
 import { useMovement } from './useMovement';
 import { useProximity } from './useProximity';
-import { useThree } from '@react-three/fiber';
+import { useThree, createPortal } from '@react-three/fiber';
+import * as THREE from 'three';
 import { useGameStore } from '@/store/useGameStore';
 import { PLAYER_HEIGHT, SPAWN_X, SPAWN_Z } from '@/lib/constants';
 
@@ -19,7 +20,7 @@ export function Player() {
   const controlsRef = useRef<any>(null);
   const keys = useKeyboard();
 
-  const { nearbyBuilding, overlayOpen, openBuilding, closeBuilding } =
+  const { nearbyBuilding, overlayOpen, openBuilding, closeBuilding, activeSlot } =
     useGameStore();
 
   // Set spawn position only once when first loading
@@ -64,8 +65,8 @@ export function Player() {
         setTimeout(requestLock, 150);
         return;
       }
-      if (e.code === 'KeyN') {
-        useGameStore.getState().toggleNight();
+      if (e.code === 'KeyN' && !overlayOpen && !useGameStore.getState().signboardOpen) {
+        useGameStore.getState().triggerNightMode();
       }
     };
     window.addEventListener('keydown', onKey);
@@ -92,17 +93,121 @@ export function Player() {
     return () => document.removeEventListener('click', blockClick, true);
   }, []);
 
+  // Scroll wheel to cycle inventory slots
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (document.pointerLockElement) {
+        useGameStore.setState((s) => {
+          let next = s.activeSlot + Math.sign(e.deltaY);
+          if (next > 7) next = 0;
+          if (next < 0) next = 7;
+          return { activeSlot: next };
+        });
+      }
+    };
+    window.addEventListener('wheel', handleWheel);
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, []);
+
+  // Primary click logic (when pointer locked)
+  const { scene } = useThree();
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      // Only process left (0) and right (2) clicks when playing the game
+      if (!document.pointerLockElement || (e.button !== 0 && e.button !== 2)) return;
+
+      const state = useGameStore.getState();
+      
+      // 1. Raycast to see if we're looking at a placed signboard
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+      const intersects = raycaster.intersectObjects(scene.children, true);
+      
+      let clickedSignId = null;
+      for (const hit of intersects) {
+        if (hit.distance > 5) break; 
+        if (hit.object.userData?.isSign && hit.object.userData?.signId) {
+          clickedSignId = hit.object.userData.signId;
+          break;
+        }
+      }
+
+      if (clickedSignId) {
+        if (e.button === 0) {
+          // Left click breaks the sign
+          state.removeSign(clickedSignId);
+          return;
+        } else if (e.button === 2) {
+          // Right click edits the sign
+          state.setSignboardOpen(true, clickedSignId);
+          releaseLock();
+          return; 
+        }
+      }
+
+      // 2. If no sign was clicked, right click while holding Signboard (Slot 7) places it
+      if (e.button === 2 && state.activeSlot === 7 && state.visitorSigns.length < 2) {
+        const dir = new THREE.Vector3();
+        camera.getWorldDirection(dir);
+        
+        // Spawn distance ~2.5 units ahead
+        const pos = camera.position.clone().add(dir.multiplyScalar(2.5));
+        
+        const newSignId = Date.now().toString(36);
+        state.addSign({
+          id: newSignId,
+          name: 'Anonymous', // Default to Anonymous for the text
+          message: '',
+          position: [pos.x, 0, pos.z],
+          rotationY: Math.atan2(dir.x, dir.z), // face away from player
+          placedAt: new Date().toISOString()
+        });
+        
+        // Optionally auto-open the sign right away for editing
+        setTimeout(() => {
+           useGameStore.getState().setSignboardOpen(true, newSignId);
+           releaseLock();
+        }, 100);
+      }
+    };
+
+    window.addEventListener('mousedown', onClick);
+    return () => window.removeEventListener('mousedown', onClick);
+  }, [camera, scene, releaseLock]);
+
   // Movement each frame
   useMovement(keys);
 
   // Proximity detection each frame
   useProximity();
 
+  // First-person hand item rendering
+  const rightHand = (
+    <group position={[0.6, -0.4, -0.8]} rotation={[0.1, -0.2, 0.05]} scale={0.4}>
+       {/* Small Sign representing the hotbar selection */}
+       <mesh position={[0, 0.5, 0]}>
+         <boxGeometry args={[0.12, 1.0, 0.12]} />
+         <meshLambertMaterial color="#7A4A1A" />
+       </mesh>
+       <mesh position={[0, 1.25, 0]}>
+         <boxGeometry args={[1.1, 0.75, 0.08]} />
+         <meshLambertMaterial color="#C8965A" />
+       </mesh>
+       <mesh position={[0, 1.25, 0.05]}>
+         <boxGeometry args={[1.14, 0.79, 0.01]} />
+         <meshLambertMaterial color="#A0622A" />
+       </mesh>
+    </group>
+  );
+
   return (
-    <PointerLockControls
-      ref={controlsRef}
-      makeDefault
-      selector="#game-canvas-container"
-    />
+    <>
+      <PointerLockControls
+        ref={controlsRef}
+        makeDefault
+        selector="#game-canvas-container"
+      />
+      {activeSlot === 7 && createPortal(rightHand, camera)}
+    </>
   );
 }
