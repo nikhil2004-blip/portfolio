@@ -98,6 +98,9 @@ export function OverlayPanel() {
               </span>
             </div>
             <div className="flex items-center gap-6">
+              <Link href="/normal" className="font-monocraft text-[10px] opacity-40 hover:opacity-100 transition-opacity uppercase tracking-tighter" style={{ color: accentColor }}>
+                Switch to Minimal
+              </Link>
               <span className="font-monocraft text-xs" style={{ color: `${accentColor}60` }}>
                 {clock}
               </span>
@@ -155,7 +158,7 @@ export function OverlayPanel() {
           {/* Bottom HUD bar */}
           <div className="relative shrink-0 px-6 py-2 border-t flex items-center justify-between cursor-default" onClick={(e) => e.stopPropagation()} style={{ borderColor: `${accentColor}30`, zIndex: 3 }}>
             <span className="font-monocraft text-xs" style={{ color: `${accentColor}40` }}>
-              RIT_CS_2026 :: CGPA_9.38 :: BUILD_PASSIONATE
+              RIT_CS_2026 :: CGPA_9.28 :: BUILD_PASSIONATE
             </span>
             <span className="font-monocraft text-xs" style={{ color: `${accentColor}40` }}>
               nikhilyadavsky2004@gmail.com

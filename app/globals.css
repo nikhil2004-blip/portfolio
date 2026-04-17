@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;500;700&family=Press+Start+2P&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -179,4 +179,87 @@ html, body, #__next {
 .mc-progress-bar {
   background: linear-gradient(to right, #5DA42E, #8BC34A);
   box-shadow: inset 0 2px 0 rgba(255,255,255,0.25);
+}
+
+/* ─── W14 Aesthetic (F1 / Tech HUD) ──────────────── */
+:root {
+  --w14-cyan: #00ffcc;
+  --w14-dark: #050505;
+  --w14-grid: rgba(0, 255, 204, 0.03);
+}
+
+.font-w14 {
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.w14-grid-bg {
+  background-image: 
+    linear-gradient(var(--w14-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--w14-grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.w14-neon-text {
+  color: var(--w14-cyan);
+  text-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
+}
+
+.w14-neon-border {
+  border: 1px solid rgba(0, 255, 204, 0.3);
+  box-shadow: inset 0 0 15px rgba(0, 255, 204, 0.05), 0 0 15px rgba(0, 255, 204, 0.1);
+}
+
+.w14-neon-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--w14-cyan), transparent);
+}
+
+.w14-stat-box {
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 2px solid var(--w14-cyan);
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+.w14-btn {
+  @apply px-8 py-3 font-w14 font-bold uppercase tracking-widest transition-all duration-300;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.w14-btn:hover {
+  border-color: var(--w14-cyan);
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+  color: var(--w14-cyan);
+}
+
+.w14-btn-primary {
+  background: var(--w14-cyan);
+  color: black;
+  border-color: var(--w14-cyan);
+}
+
+.w14-btn-primary:hover {
+  background: transparent;
+  color: var(--w14-cyan);
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.scanline {
+  width: 100%;
+  height: 100px;
+  z-index: 5;
+  background: linear-gradient(to bottom, transparent, rgba(0, 255, 204, 0.02), transparent);
+  opacity: 0.1;
+  position: absolute;
+  pointer-events: none;
+  animation: scanline 8s linear infinite;
 }
