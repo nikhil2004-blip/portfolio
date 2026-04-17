@@ -1,9 +1,9 @@
 export const about = {
   name: 'Nikhil Kumar Yadav',
-  title: 'CS @ RIT | 9.38 CGPA (yes, really)',
+  title: 'CS @ RIT | 9.28 CGPA (yes, really)',
   photo: '/images/avatar.jpg',
   bio: [
-    "CS undergrad at Ramaiah Institute of Technology pulling a 9.38 CGPA — which is either impressive or concerning depending on how you feel about people who actually read textbooks. I build apps, break things, fix them, and occasionally ship something that survives contact with real users.",
+    "CS undergrad at Ramaiah Institute of Technology pulling a 9.28 CGPA — which is either impressive or concerning depending on how you feel about people who actually read textbooks. I build apps, break things, fix them, and occasionally ship something that survives contact with real users.",
     "My stack spans Flutter, React, Node.js, Firebase, and whatever else the project demands. I've done Android internship research at Samsung R&D, civic tech for Smart India Hackathon, and contributed to open-source tools — all while maintaining the academic performance my parents brag about at family dinners.",
   ],
   education: [
@@ -11,7 +11,7 @@ export const about = {
       institution: 'Ramaiah Institute of Technology',
       degree: 'B.E. Computer Science and Engineering',
       period: '2022 – 2026',
-      score: 'CGPA: 9.38 / 10.00',
+      score: 'CGPA: 9.28 / 10.00',
       courses: 'OOP, DSA, DBMS, OS, Computer Networks, Cryptography & Network Security',
     },
     {
@@ -46,5 +46,5 @@ export const about = {
     '🎯 NSTSE State Rank 5 — apparently competitive exams were also a thing.',
     '🌀 Diagnosed with "just one more feature" syndrome. Seeking treatment.',
   ],
-  resumeUrl: '/resume.pdf',
+  resumeUrl: '/NIK_MAIN.pdf',
 };

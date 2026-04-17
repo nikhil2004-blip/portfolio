@@ -36,3 +36,6 @@ next-env.d.ts
 .gemini
 .code-review-graph
 fetch_*.js
+
+# Convex
+convex/_generated/

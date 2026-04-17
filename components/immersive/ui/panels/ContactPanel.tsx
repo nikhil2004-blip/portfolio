@@ -1,9 +1,17 @@
-import { Mail, GitBranch, Briefcase, Terminal } from 'lucide-react';
+import { Mail, GitBranch, Briefcase, Terminal, Copy, Check } from 'lucide-react';
 import { contact } from '@/content/experience';
+import { useState } from 'react';
 
 interface Props { accentColor: string; }
 
 export function ContactPanel({ accentColor }: Props) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
   const links = [
     { label: 'EMAIL', href: `mailto:${contact.email}`, value: contact.email, Icon: Mail },
     { label: 'GITHUB', href: contact.github, value: 'nikhil2004-blip', Icon: GitBranch },
@@ -38,7 +46,7 @@ export function ContactPanel({ accentColor }: Props) {
           <a
             key={link.label}
             href={link.href}
-            target="_blank"
+            target={link.label === 'EMAIL' ? undefined : "_blank"}
             rel="noopener noreferrer"
             className="flex items-center justify-between border p-4 transition-all duration-200 hover:scale-[1.01] hover:opacity-80 group"
             style={{ borderColor: `${accentColor}25`, background: 'rgba(255,255,255,0.02)' }}
@@ -52,19 +60,55 @@ export function ContactPanel({ accentColor }: Props) {
                 <div className="text-gray-300 text-sm mt-0.5">{link.value}</div>
               </div>
             </div>
-            <span className="font-monocraft text-xs opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: accentColor }}>
-              [ OPEN → ]
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="font-monocraft text-xs opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: accentColor }}>
+                {link.label === 'EMAIL' ? '[ SEND MAIL ✉ ]' : '[ OPEN → ]'}
+              </span>
+              {link.label === 'EMAIL' && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    copyToClipboard(contact.email, 'email');
+                  }}
+                  className="p-2 border transition-colors hover:bg-white/10"
+                  style={{ borderColor: `${accentColor}40`, color: accentColor }}
+                  title="Copy to clipboard"
+                >
+                  {copiedId === 'email' ? <Check size={14} /> : <Copy size={14} />}
+                </button>
+              )}
+            </div>
           </a>
         ))}
+        {copiedId === 'email' && (
+          <div className="text-center font-monocraft text-[10px] animate-bounce" style={{ color: accentColor }}>
+            [ ✓ EMAIL COPIED TO CLIPBOARD ]
+          </div>
+        )}
       </div>
 
       {/* Phone */}
-      <div className="border p-4" style={{ borderColor: `${accentColor}20`, background: 'rgba(255,255,255,0.02)' }}>
-        <div className="font-monocraft text-xs mb-1" style={{ color: accentColor }}>DIRECT_LINE</div>
-        <div className="text-gray-300 text-sm font-monocraft">{contact.phone}</div>
-        <div className="text-gray-600 text-xs mt-1">{"// Actual humans only. Recruiters welcome. Spam not."}</div>
+      <div className="border p-4 flex items-center justify-between group" style={{ borderColor: `${accentColor}20`, background: 'rgba(255,255,255,0.02)' }}>
+        <div>
+          <div className="font-monocraft text-xs mb-1" style={{ color: accentColor }}>DIRECT_LINE</div>
+          <div className="text-gray-300 text-sm font-monocraft">{contact.phone}</div>
+          <div className="text-gray-600 text-xs mt-1">{"// Actual humans only. Recruiters welcome. Spam not."}</div>
+        </div>
+        <button
+          onClick={() => copyToClipboard(contact.phone, 'phone')}
+          className="p-2 border transition-colors hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ borderColor: `${accentColor}40`, color: accentColor }}
+          title="Copy phone number"
+        >
+          {copiedId === 'phone' ? <Check size={14} /> : <Copy size={14} />}
+        </button>
       </div>
+      {copiedId === 'phone' && (
+        <div className="text-center font-monocraft text-[10px] animate-bounce" style={{ color: accentColor }}>
+          [ ✓ PHONE NUMBER COPIED ]
+        </div>
+      )}
 
       <p className="font-monocraft text-xs text-center opacity-30">
         {"// connection latency: 1 day (max) :: preferred protocol: email :: fallback: LinkedIn"}

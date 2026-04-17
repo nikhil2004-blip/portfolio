@@ -19,6 +19,7 @@ import { ControlsGuide } from './ui/ControlsGuide';
 import { Inventory } from './ui/Inventory';
 import { SignModal } from './ui/SignModal';
 import { NightTransitionScreen } from './ui/NightTransitionScreen';
+import { GlobalGuestbook } from './ui/GlobalGuestbook';
 
 import { useGameStore } from '@/store/useGameStore';
 
@@ -44,6 +45,7 @@ export default function ImmersiveWorld() {
       <Inventory />
       <SignModal />
       <NightTransitionScreen />
+      <GlobalGuestbook />
 
       {/* 3D Canvas (Lock Target) */}
       <div id="game-canvas-container" className="absolute inset-0">

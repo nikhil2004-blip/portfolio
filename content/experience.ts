@@ -90,7 +90,7 @@ export const achievements = [
   { label: 'wHACKiest \'24', desc: 'Top 5 (MSRIT)', icon: '🏆' },
   { label: 'PRMO & RMO', desc: 'Qualified — Math olympiads, because why not.', icon: '📐' },
   { label: 'NSTSE', desc: 'State Rank: 5', icon: '🧠' },
-  { label: 'CGPA: 9.38', desc: 'Ramaiah Institute of Technology', icon: '🎓' },
+  { label: 'CGPA: 9.28', desc: 'Ramaiah Institute of Technology', icon: '🎓' },
 ];
 
 export const contact = {
@@ -98,6 +98,6 @@ export const contact = {
   phone: '+91 9650909795',
   github: 'https://github.com/nikhil2004-blip',
   linkedin: 'https://www.linkedin.com/in/nikhil-kumar-yadav-a66769327/',
-  leetcode: 'https://leetcode.com/',
+  leetcode: 'https://leetcode.com/u/nikhil_kumar_yadav/',
   status: 'Open to opportunities (and good memes) 🟢',
 };

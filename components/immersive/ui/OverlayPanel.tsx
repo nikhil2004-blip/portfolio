@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/useGameStore';
 
@@ -25,13 +25,33 @@ const BUILDING_LABELS: Record<string, { title: string; subtitle: string; color: 
 export function OverlayPanel() {
   const { overlayOpen, activeBuilding, closeBuilding } = useGameStore();
   const panelRef = useRef<HTMLDivElement>(null);
+  const [clock, setClock] = useState(() =>
+    new Date().toLocaleTimeString('en-IN', { hour12: false })
+  );
+
+  // Tick clock every second
+  useEffect(() => {
+    const id = setInterval(() =>
+      setClock(new Date().toLocaleTimeString('en-IN', { hour12: false }))
+    , 1000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     if (overlayOpen && panelRef.current) panelRef.current.focus();
   }, [overlayOpen]);
 
+  const handleClose = () => {
+    closeBuilding();
+    // Small delay to ensure the DOM has updated and UI is gone
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas');
+      if (canvas) canvas.requestPointerLock();
+    }, 150);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') closeBuilding();
+    if (e.key === 'Escape') handleClose();
   };
 
   const meta = activeBuilding ? BUILDING_LABELS[activeBuilding] : null;
@@ -46,7 +66,7 @@ export function OverlayPanel() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          onClick={closeBuilding}
+          onClick={handleClose}
           onPointerDown={(e) => e.nativeEvent.stopPropagation()}
           className="absolute inset-0 z-50 flex flex-col cursor-pointer"
           style={{ background: 'rgba(0,0,0,0.97)' }}
@@ -79,11 +99,11 @@ export function OverlayPanel() {
             </div>
             <div className="flex items-center gap-6">
               <span className="font-monocraft text-xs" style={{ color: `${accentColor}60` }}>
-                {new Date().toLocaleTimeString('en-IN', { hour12: false })}
+                {clock}
               </span>
               <button
-                onClick={closeBuilding}
-                onPointerDown={(e) => { e.stopPropagation(); closeBuilding(); }}
+                onClick={handleClose}
+                onPointerDown={(e) => { e.stopPropagation(); handleClose(); }}
                 className="font-monocraft text-xs px-3 py-1 border transition-all duration-200 hover:opacity-80 relative z-50 pointer-events-auto"
                 style={{ borderColor: `${accentColor}60`, color: accentColor }}
               >

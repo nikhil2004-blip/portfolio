@@ -1,5 +1,7 @@
 'use client';
 import { useGameStore } from '@/store/useGameStore';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 const BLOCKS = [
   { label: '1', color: '#5A8A35', title: 'Grass Block' },
@@ -12,11 +14,12 @@ const BLOCKS = [
 ];
 
 export function Inventory() {
-  const { overlayOpen, visitorSigns, activeSlot, setActiveSlot } = useGameStore();
+  const { overlayOpen, activeSlot, setActiveSlot, visitorId } = useGameStore();
+  const convexSigns = useQuery(api.signs.get) || [];
 
   if (overlayOpen) return null;
 
-  const signCount = visitorSigns.length;
+  const signCount = convexSigns.filter(s => s.uid === visitorId).length;
   const canPlace = signCount < 2;
 
   return (

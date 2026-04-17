@@ -12,6 +12,12 @@
 }
 
 /* ─── Custom scrollbar (for holo panels) ────────── */
+.custom-scrollbar {
+  /* No CSS scroll-behavior: smooth — it conflicts with trackpad inertia.
+     Trackpads deliver their own hardware-smooth events; double-smoothing = lag. */
+  overscroll-behavior: contain; /* prevent scroll from bleeding to parent/3D canvas */
+  will-change: scroll-position;  /* hint browser to GPU-accelerate this layer */
+}
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }

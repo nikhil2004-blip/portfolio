@@ -8,6 +8,8 @@ import { useThree, createPortal } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGameStore } from '@/store/useGameStore';
 import { PLAYER_HEIGHT, SPAWN_X, SPAWN_Z } from '@/lib/constants';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 let spawned = false;
 
@@ -20,7 +22,7 @@ export function Player() {
   const controlsRef = useRef<any>(null);
   const keys = useKeyboard();
 
-  const { nearbyBuilding, overlayOpen, openBuilding, closeBuilding, activeSlot } =
+  const { nearbyBuilding, overlayOpen, openBuilding, closeBuilding, activeSlot, globalGuestbookOpen, signboardOpen } =
     useGameStore();
 
   // Set spawn position only once when first loading
@@ -59,11 +61,23 @@ export function Player() {
         releaseLock();
         return;
       }
-      if (e.code === 'Escape' && overlayOpen) {
-        closeBuilding();
-        // Small delay to let React re-render the overlay away before requesting lock
-        setTimeout(requestLock, 150);
-        return;
+      if (e.code === 'Escape') {
+        const state = useGameStore.getState();
+        if (overlayOpen) {
+          closeBuilding();
+          setTimeout(requestLock, 150);
+          return;
+        }
+        if (state.globalGuestbookOpen) {
+          state.setGlobalGuestbookOpen(false);
+          setTimeout(requestLock, 150);
+          return;
+        }
+        if (state.signboardOpen) {
+          state.setSignboardOpen(false);
+          setTimeout(requestLock, 150);
+          return;
+        }
       }
       if (e.code === 'KeyN' && !overlayOpen && !useGameStore.getState().signboardOpen) {
         useGameStore.getState().triggerNightMode();
@@ -75,18 +89,22 @@ export function Player() {
 
   // When overlay opens, always release the lock; when it closes, re-acquire
   useEffect(() => {
-    if (overlayOpen) {
+    if (overlayOpen || globalGuestbookOpen || signboardOpen) {
       releaseLock();
     }
     // Do NOT auto-lock when closing — the ESC handler handles it,
     // and auto-enter via proximity also handles it via clicking canvas.
-  }, [overlayOpen, releaseLock]);
+  }, [overlayOpen, globalGuestbookOpen, signboardOpen, releaseLock]);
 
   // Intercept global clicks to prevent locking when UI is open
   useEffect(() => {
     const blockClick = (e: MouseEvent) => {
-      if (useGameStore.getState().overlayOpen) {
-        e.stopPropagation();
+      const state = useGameStore.getState();
+      if (state.overlayOpen || state.globalGuestbookOpen || state.signboardOpen) {
+        // Only block if the user somehow clicked the underlying canvas while a modal is up
+        if (e.target instanceof HTMLElement && e.target.tagName.toLowerCase() === 'canvas') {
+          e.stopPropagation();
+        }
       }
     };
     document.addEventListener('click', blockClick, true);
@@ -111,69 +129,86 @@ export function Player() {
 
   // Primary click logic (when pointer locked)
   const { scene } = useThree();
+  const removeSignConvex = useMutation(api.signs.remove);
+  const convexSigns = useQuery(api.signs.get) || [];
+  
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      // Only process left (0) and right (2) clicks when playing the game
-      if (!document.pointerLockElement || (e.button !== 0 && e.button !== 2)) return;
+    let breakingTimer: NodeJS.Timeout | null = null;
+    let currentBreakingId: string | null = null;
 
-      const state = useGameStore.getState();
-      
-      // 1. Raycast to see if we're looking at a placed signboard
+    const doRaycast = () => {
       const raycaster = new THREE.Raycaster();
       raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
       const intersects = raycaster.intersectObjects(scene.children, true);
       
-      let clickedSignId = null;
       for (const hit of intersects) {
         if (hit.distance > 5) break; 
         if (hit.object.userData?.isSign && hit.object.userData?.signId) {
-          clickedSignId = hit.object.userData.signId;
-          break;
+          return { id: hit.object.userData.signId, uid: hit.object.userData.uid };
         }
       }
+      return null;
+    };
 
-      if (clickedSignId) {
-        if (e.button === 0) {
-          // Left click breaks the sign
-          state.removeSign(clickedSignId);
-          return;
-        } else if (e.button === 2) {
-          // Right click edits the sign
-          state.setSignboardOpen(true, clickedSignId);
+    const onMouseDown = (e: MouseEvent) => {
+      if (!document.pointerLockElement || (e.button !== 0 && e.button !== 2)) return;
+
+      const state = useGameStore.getState();
+      const clicked = doRaycast();
+
+      if (clicked) {
+         if (clicked.uid === state.visitorId) {
+           if (e.button === 2) {
+             // Right click down - start breaking/editing
+             state.setBreakingSignId(clicked.id);
+             currentBreakingId = clicked.id;
+             breakingTimer = setTimeout(() => {
+                removeSignConvex({ id: clicked.id as any });
+                useGameStore.getState().setBreakingSignId(null);
+                currentBreakingId = null;
+             }, 600); // 600ms for long press
+             return;
+           }
+         }
+         return; // Clicked a sign, stop here
+      }
+
+      // No sign clicked. If Left Click (button 0) + Slot 7: Place
+      if (e.button === 0 && state.activeSlot === 7) {
+        const mySigns = convexSigns.filter(s => s.uid === state.visitorId);
+        if (mySigns.length < 2) {
+          const dir = new THREE.Vector3();
+          camera.getWorldDirection(dir);
+          const pos = camera.position.clone().add(dir.multiplyScalar(2.5));
+          state.startPlacingSign({
+            position: [pos.x, 0, pos.z],
+            rotationY: Math.atan2(dir.x, dir.z),
+          });
           releaseLock();
-          return; 
         }
-      }
-
-      // 2. If no sign was clicked, right click while holding Signboard (Slot 7) places it
-      if (e.button === 2 && state.activeSlot === 7 && state.visitorSigns.length < 2) {
-        const dir = new THREE.Vector3();
-        camera.getWorldDirection(dir);
-        
-        // Spawn distance ~2.5 units ahead
-        const pos = camera.position.clone().add(dir.multiplyScalar(2.5));
-        
-        const newSignId = Date.now().toString(36);
-        state.addSign({
-          id: newSignId,
-          name: 'Anonymous', // Default to Anonymous for the text
-          message: '',
-          position: [pos.x, 0, pos.z],
-          rotationY: Math.atan2(dir.x, dir.z), // face away from player
-          placedAt: new Date().toISOString()
-        });
-        
-        // Optionally auto-open the sign right away for editing
-        setTimeout(() => {
-           useGameStore.getState().setSignboardOpen(true, newSignId);
-           releaseLock();
-        }, 100);
       }
     };
 
-    window.addEventListener('mousedown', onClick);
-    return () => window.removeEventListener('mousedown', onClick);
-  }, [camera, scene, releaseLock]);
+    const onMouseUp = (e: MouseEvent) => {
+      if (e.button === 2 && currentBreakingId) {
+        if (breakingTimer) clearTimeout(breakingTimer);
+        useGameStore.getState().setBreakingSignId(null);
+        
+        // Treat as a short right-click -> edit
+        useGameStore.getState().setSignboardOpen(true, currentBreakingId);
+        releaseLock();
+        currentBreakingId = null;
+      }
+    };
+
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mouseup', onMouseUp);
+      if (breakingTimer) clearTimeout(breakingTimer);
+    };
+  }, [camera, scene, releaseLock, convexSigns, removeSignConvex]);
 
   // Movement each frame
   useMovement(keys);

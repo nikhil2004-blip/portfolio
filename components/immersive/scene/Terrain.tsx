@@ -55,22 +55,19 @@ export function Terrain() {
     // 2. Generate Perimeter Fence (-51 and 51)
     // Post-and-rail design: thin vertical pillars + horizontal bars
     const placeFenceSection = (x: number, z: number, isVerticalZ: boolean) => {
-      // 2.1 Vertical Post (every 2 blocks)
-      const isPost = (isVerticalZ ? Math.round(z) : Math.round(x)) % 2 === 0;
-      if (isPost) {
-        dummy.position.set(x, 0.6, z); // Center of pillar
-        dummy.scale.set(0.3, 1.2, 0.3); // Thin pillar
-        dummy.updateMatrix();
-        stoneRef.current?.setMatrixAt(stoneCount++, dummy.matrix);
-      }
+      // 2.1 Vertical Post (every block)
+      dummy.position.set(x, 0.75, z); // Center of pillar (height 1.5)
+      dummy.scale.set(0.2, 1.5, 0.2); // Thin pillar, not taller than player
+      dummy.updateMatrix();
+      stoneRef.current?.setMatrixAt(stoneCount++, dummy.matrix);
 
-      // 2.2 Horizontal Rails (every block)
+      // 2.2 Horizontal Rails
       // Top rail
-      dummy.position.set(x, 1.0, z);
+      dummy.position.set(x, 1.2, z);
       if (isVerticalZ) {
-        dummy.scale.set(0.15, 0.1, 1.0); // Longitudinal on Z
+        dummy.scale.set(0.08, 0.08, 1.0); // Longitudinal on Z
       } else {
-        dummy.scale.set(1.0, 0.1, 0.15); // Longitudinal on X
+        dummy.scale.set(1.0, 0.08, 0.08); // Longitudinal on X
       }
       dummy.updateMatrix();
       stoneRef.current?.setMatrixAt(stoneCount++, dummy.matrix);

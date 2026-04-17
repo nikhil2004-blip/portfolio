@@ -1,12 +1,8 @@
 import { create } from 'zustand';
 
-export interface GuestSign {
-  id: string;
-  name: string;
-  message: string;
+interface PendingSign {
   position: [number, number, number];
   rotationY: number;
-  placedAt: string;
 }
 
 interface GameState {
@@ -26,10 +22,12 @@ interface GameState {
 
   // ── guestbook / visitor state ────────────────────
   visitorId: string;
-  visitorSigns: GuestSign[];
   signboardOpen: boolean;
   editingSignId: string | null;
+  pendingSign: PendingSign | null;
   activeSlot: number;
+  breakingSignId: string | null;
+  globalGuestbookOpen: boolean;
 
   // ── actions ─────────────────────────────────────
   setNearbyBuilding: (id: string | null) => void;
@@ -44,11 +42,11 @@ interface GameState {
 
   // ── guestbook actions ─────────────────────────────
   initVisitor: () => void;
-  addSign: (sign: GuestSign) => void;
-  removeSign: (id: string) => void;
-  updateSign: (id: string, updates: Partial<GuestSign>) => void;
   setSignboardOpen: (isOpen: boolean, signId?: string | null) => void;
+  startPlacingSign: (sign: PendingSign) => void;
   setActiveSlot: (slot: number) => void;
+  setBreakingSignId: (id: string | null) => void;
+  setGlobalGuestbookOpen: (isOpen: boolean) => void;
 }
 
 function generateId(): string {
@@ -68,10 +66,12 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // guestbook defaults
   visitorId: '',
-  visitorSigns: [],
   signboardOpen: false,
   editingSignId: null,
+  pendingSign: null,
   activeSlot: 0,
+  breakingSignId: null,
+  globalGuestbookOpen: false,
 
   setNearbyBuilding: (id) => set({ nearbyBuilding: id }),
 
@@ -86,22 +86,15 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   triggerNightMode: () => {
     const { hasToggledNight, isNight } = get();
-    // Only show loading screen on the first switch to night.
     if (!hasToggledNight && !isNight) {
-      // Just set the flag — the NightTransitionScreen component will
-      // use a double-rAF to guarantee a paint BEFORE flipping isNight
-      // (which freezes the browser while compiling WebGL shaders).
       set({ isTransitioningNight: true });
     } else {
       get().toggleNight();
     }
   },
 
-  // Called by NightTransitionScreen after it has confirmed a browser paint
   _setNightAndFinish: () => {
     set({ isNight: true, hasToggledNight: true });
-    // After setting isNight, the browser will freeze to compile shaders.
-    // Once it unfreezes, we wait briefly then dismiss the screen.
     setTimeout(() => set({ isTransitioningNight: false }), 800);
   },
 
@@ -124,46 +117,20 @@ export const useGameStore = create<GameState>((set, get) => ({
       localStorage.setItem('portfolio_vid', vid);
     }
 
-    // Load cached signs from localStorage
-    let signs: GuestSign[] = [];
-    try {
-      const raw = localStorage.getItem('portfolio_signs');
-      if (raw) signs = JSON.parse(raw);
-    } catch {
-      signs = [];
-    }
-
-    set({ visitorId: vid, visitorSigns: signs });
+    set({ visitorId: vid });
   },
 
-  addSign: (sign) => {
-    const current = get().visitorSigns;
-    const updated = [...current, sign];
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('portfolio_signs', JSON.stringify(updated));
-    }
-    set({ visitorSigns: updated });
+  setSignboardOpen: (isOpen, signId = null) => {
+    set({ signboardOpen: isOpen, editingSignId: signId, pendingSign: isOpen ? get().pendingSign : null });
   },
 
-  removeSign: (id) => {
-    const current = get().visitorSigns;
-    const updated = current.filter(s => s.id !== id);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('portfolio_signs', JSON.stringify(updated));
-    }
-    set({ visitorSigns: updated });
+  startPlacingSign: (sign) => {
+    set({ pendingSign: sign, signboardOpen: true, editingSignId: null });
   },
-
-  updateSign: (id, updates) => {
-    const current = get().visitorSigns;
-    const updated = current.map(s => s.id === id ? { ...s, ...updates } : s);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('portfolio_signs', JSON.stringify(updated));
-    }
-    set({ visitorSigns: updated });
-  },
-
-  setSignboardOpen: (isOpen, signId = null) => set({ signboardOpen: isOpen, editingSignId: signId }),
   
   setActiveSlot: (slot) => set({ activeSlot: slot }),
+
+  setBreakingSignId: (id) => set({ breakingSignId: id }),
+
+  setGlobalGuestbookOpen: (isOpen) => set({ globalGuestbookOpen: isOpen, overlayOpen: isOpen }),
 }));

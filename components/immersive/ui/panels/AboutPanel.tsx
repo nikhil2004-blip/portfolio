@@ -41,7 +41,7 @@ export function AboutPanel({ accentColor }: Props) {
       {/* Stat bar */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'CGPA', value: '9.38', sub: '/ 10.00' },
+          { label: 'CGPA', value: '9.28', sub: '/ 10.00' },
           { label: 'NSTSE RANK', value: '#5', sub: 'State Level' },
           { label: 'HACKATHONS', value: '2', sub: 'Top placements' },
           { label: 'OPEN SOURCE', value: '✓', sub: 'Merged PRs' },

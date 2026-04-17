@@ -1,5 +1,5 @@
 'use client';
-import { hackathons, achievements } from '@/content/experience';
+import { experience as expData, hackathons, achievements } from '@/content/experience';
 import {
   Trophy,
   Award,
@@ -7,6 +7,8 @@ import {
   GraduationCap,
   Radio,
   Brain,
+  Briefcase,
+  GitBranch,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -22,8 +24,54 @@ const ICON_MAP: Record<string, LucideIcon> = {
 interface Props { accentColor: string; }
 
 export function LeadershipPanel({ accentColor }: Props) {
+  const workItems = expData.filter(e => e.type === 'work' || e.type === 'open-source');
+
   return (
     <div className="text-white space-y-6 py-4">
+
+      {/* Work Experience */}
+      <div>
+        <h3 className="font-monocraft text-sm tracking-widest mb-4" style={{ color: accentColor }}>▸ PROFESSIONAL_EXPERIENCE</h3>
+        <div className="space-y-5 relative border-l pl-6" style={{ borderColor: `${accentColor}40` }}>
+          {workItems.map((exp, idx) => (
+            <div key={idx} className="relative">
+              <div
+                className="absolute -left-[23px] top-2 w-2.5 h-2.5 border-2"
+                style={{ background: 'black', borderColor: accentColor }}
+              />
+              <div className="border p-4" style={{ borderColor: `${accentColor}20`, background: 'rgba(255,255,255,0.02)' }}>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-1 mb-2">
+                  <div className="flex items-center gap-3">
+                    <div style={{ color: accentColor }}>
+                      {exp.type === 'work' ? <Briefcase size={16} /> : <GitBranch size={16} />}
+                    </div>
+                    {exp.badge && (
+                      <span className="font-monocraft text-[10px] px-2 py-0.5 border" style={{ borderColor: `${accentColor}50`, color: accentColor }}>
+                        {exp.badge}
+                      </span>
+                    )}
+                    {exp.org.includes('Samsung') && (
+                      <span className="font-monocraft text-[10px] px-2 py-0.5 bg-green-500/20 border border-green-500/50 text-green-400 animate-pulse">
+                        CURRENT
+                      </span>
+                    )}
+                    <h4 className="font-monocraft text-sm font-bold" style={{ color: accentColor }}>{exp.role}</h4>
+                  </div>
+                  <span className="font-monocraft text-[10px] text-gray-500">{exp.period}</span>
+                </div>
+                <p className="text-gray-500 text-xs mb-2">{exp.org}</p>
+                <ul className="space-y-1">
+                  {exp.bullets.map((b, i) => (
+                    <li key={i} className="text-gray-300 text-xs flex gap-2">
+                      <span style={{ color: `${accentColor}60` }}>›</span> {b}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Achievements grid */}
       <div>

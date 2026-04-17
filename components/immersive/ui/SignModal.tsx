@@ -1,13 +1,15 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import { useGameStore, GuestSign } from '@/store/useGameStore';
-
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
-}
+import { useGameStore } from '@/store/useGameStore';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 export function SignModal() {
-  const { signboardOpen, setSignboardOpen, visitorId, visitorSigns, addSign, updateSign, editingSignId } = useGameStore();
+  const { signboardOpen, setSignboardOpen, visitorId, editingSignId, pendingSign } = useGameStore();
+  const convexSigns = useQuery(api.signs.get) || [];
+  const addSign = useMutation(api.signs.add);
+  const updateSign = useMutation(api.signs.update);
+  
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -17,10 +19,14 @@ export function SignModal() {
   useEffect(() => {
     if (signboardOpen) {
       if (editingSignId) {
-        const signToEdit = visitorSigns.find(s => s.id === editingSignId);
-        if (signToEdit) {
+        const signToEdit = convexSigns.find(s => s._id === editingSignId);
+        if (signToEdit && signToEdit.uid === visitorId) {
            setName(signToEdit.name !== 'Anonymous' ? signToEdit.name : '');
            setMessage(signToEdit.message);
+        } else {
+           // Should not happen if Player.tsx does its checks, but just in case
+           setSignboardOpen(false);
+           return;
         }
       } else {
         setName('Anonymous');
@@ -30,13 +36,16 @@ export function SignModal() {
       setErrorText('');
       setTimeout(() => nameRef.current?.focus(), 50);
     }
-  }, [signboardOpen, editingSignId, visitorSigns]);
+  }, [signboardOpen, editingSignId, convexSigns, visitorId, setSignboardOpen]);
 
   if (!signboardOpen) return null;
 
-  // Determine which slot to use
-  const usedSlots = visitorSigns.map((s) => s.slot);
-  const nextSlot: 1 | 2 = usedSlots.includes(1) ? 2 : 1;
+  // Determine how many slots you're using.
+  const mySigns = convexSigns.filter(s => s.uid === visitorId);
+  const totalSignsCount = mySigns.length;
+  // If editing, we aren't using a new slot. If adding, we'll be next slot.
+  const isEditing = !!editingSignId;
+  const currentSlotNumber = isEditing ? (mySigns.findIndex(s => s._id === editingSignId) + 1) : Math.min(2, totalSignsCount + 1);
 
   const remaining = message.length;
   const canSubmit = message.trim().length > 0 && remaining <= 100 && status !== 'loading';
@@ -48,52 +57,53 @@ export function SignModal() {
     const finalName = name.trim() || 'Anonymous';
     const finalMessage = message.trim();
 
-    if (editingSignId) {
-       updateSign(editingSignId, { name: finalName, message: finalMessage });
-       // Also notify GitHub logic optionally
-       try {
-         fetch('/api/sign', {
-           method: 'POST',
-           headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({ visitorId, name: finalName, message: finalMessage, slot: visitorSigns.find(s=>s.id === editingSignId)?.slot || 1 }),
-         }).catch(() => {});
-       } catch {}
-    } else {
-       const sign: GuestSign = {
-         id: generateId(),
-         name: finalName,
-         message: finalMessage,
-         slot: nextSlot,
-         placedAt: new Date().toISOString(),
-       };
-       addSign(sign);
-       try {
-         fetch('/api/sign', {
-           method: 'POST',
-           headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({ visitorId, name: sign.name, message: sign.message, slot: sign.slot }),
-         }).catch(() => {});
-       } catch {}
+    try {
+      if (editingSignId) {
+         await updateSign({
+           id: editingSignId as any,
+           name: finalName,
+           message: finalMessage,
+         });
+      } else if (pendingSign) {
+         await addSign({
+           uid: visitorId,
+           name: finalName,
+           message: finalMessage,
+           position: pendingSign.position,
+           rotationY: pendingSign.rotationY,
+           placedAt: new Date().toISOString(),
+         });
+      }
+      setStatus('success');
+      setTimeout(() => {
+        setSignboardOpen(false);
+        setName('');
+        setMessage('');
+        setStatus('idle');
+      }, 1800);
+    } catch (err) {
+      setStatus('error');
+      setErrorText('Failed to sync sign to the global server.');
     }
-
-    setStatus('success');
-    setTimeout(() => {
-      setSignboardOpen(false);
-      setName('');
-      setMessage('');
-      setStatus('idle');
-    }, 1800);
   }
 
+  const closeModal = () => {
+    setSignboardOpen(false);
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas');
+      if (canvas) canvas.requestPointerLock();
+    }, 100);
+  };
+
   function handleKey(e: React.KeyboardEvent) {
-    if (e.key === 'Escape') { setSignboardOpen(false); }
+    if (e.key === 'Escape') { closeModal(); }
   }
 
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(3px)' }}
-      onClick={() => setSignboardOpen(false)}
+      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(3px)', pointerEvents: 'auto' }}
+      onClick={closeModal}
       onKeyDown={handleKey}
     >
       {/* Sign editor box */}
@@ -127,11 +137,11 @@ export function SignModal() {
               <rect x="4" y="6" width="10" height="1.5" rx="0.5" fill="rgba(0,0,0,0.25)" />
             </svg>
             <span style={{ color: '#F5CF60', fontSize: 13, fontWeight: 'bold', letterSpacing: 2 }}>
-              EDIT SIGN
+              {isEditing ? 'EDIT SIGN' : 'PLACE SIGN'}
             </span>
           </div>
           <button
-            onClick={() => setSignboardOpen(false)}
+            onClick={closeModal}
             style={{
               background: 'none', border: 'none', color: '#A0622A',
               cursor: 'pointer', fontSize: 16, padding: '0 4px',
@@ -248,7 +258,7 @@ export function SignModal() {
 
           {/* Slot info */}
           <div style={{ color: 'rgba(160,98,42,0.6)', fontSize: 10, marginBottom: 12 }}>
-            Placing sign #{nextSlot} of 2 · signs are visible only to you · survives refresh
+            Placing sign #{currentSlotNumber} of 2 · visible to everyone globally
           </div>
 
           {/* Buttons */}
@@ -277,7 +287,7 @@ export function SignModal() {
                 : '[ ✎ PLACE SIGN ]'}
             </button>
             <button
-              onClick={() => setSignboardOpen(false)}
+              onClick={closeModal}
               style={{
                 background: 'none',
                 border: '2px solid rgba(107,66,38,0.5)',
