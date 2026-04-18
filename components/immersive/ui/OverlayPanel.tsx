@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 import { useGameStore } from '@/store/useGameStore';
 
 import { AboutPanel } from './panels/AboutPanel';
@@ -140,6 +141,7 @@ export function OverlayPanel() {
             onKeyDown={handleKeyDown}
             onClick={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
+            onWheel={(e) => e.stopPropagation()}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25, duration: 0.3 }}

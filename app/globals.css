@@ -13,10 +13,14 @@
 
 /* ─── Custom scrollbar (for holo panels) ────────── */
 .custom-scrollbar {
-  /* No CSS scroll-behavior: smooth — it conflicts with trackpad inertia.
-     Trackpads deliver their own hardware-smooth events; double-smoothing = lag. */
+  scroll-behavior: smooth;
   overscroll-behavior: contain; /* prevent scroll from bleeding to parent/3D canvas */
   will-change: scroll-position;  /* hint browser to GPU-accelerate this layer */
+  scroll-snap-type: y proximity;
+}
+.custom-scrollbar > div > div {
+  scroll-snap-align: start;
+  scroll-margin-top: 1.5rem;
 }
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -30,10 +34,10 @@
   padding: 0;
 }
 
-html, body, #__next {
+html, body {
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
+  overflow-x: hidden;
   background: #000;
 }
 

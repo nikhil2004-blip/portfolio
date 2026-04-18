@@ -163,7 +163,7 @@ export function GlobalGuestbook() {
                   wordBreak: 'break-word',
                   lineHeight: '1.4'
                 }}>
-                  "{sign.message}"
+                  &quot;{sign.message}&quot;
                 </p>
               </div>
             ))
