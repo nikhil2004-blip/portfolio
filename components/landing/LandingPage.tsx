@@ -206,12 +206,7 @@ export default function LandingPage() {
                 Nikhil <br />
                 Kumar <br />
                 <span 
-                  className="text-transparent" 
-                  style={{ 
-                    WebkitTextStroke: '1.5px #D4FF00',
-                    // Smoother shadow-based outline for mobile devices
-                    textShadow: '0 0 0px #D4FF00' // Placeholder for shadow if needed, but keeping stroke for desktop
-                  }}
+                  className="text-[#D4FF00] sm:text-transparent hero-stroke-desktop"
                 >
                   Yadav.
                 </span>

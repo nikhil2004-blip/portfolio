@@ -267,3 +267,10 @@ html, body {
   pointer-events: none;
   animation: scanline 8s linear infinite;
 }
+
+/* ─── Hero Utils ────────────────────────────────── */
+@media (min-width: 640px) {
+  .hero-stroke-desktop {
+    -webkit-text-stroke: 1.5px #D4FF00;
+  }
+}
