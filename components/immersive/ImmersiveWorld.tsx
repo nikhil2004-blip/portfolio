@@ -52,6 +52,20 @@ export default function ImmersiveWorld() {
     return () => window.removeEventListener('resize', checkMobile);
   }, [setIsMobile]);
 
+  // Lock body scroll and prevent touch gestures specifically for the immersive world
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    const originalTouch = window.getComputedStyle(document.body).touchAction;
+    
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    
+    return () => {
+      document.body.style.overflow = originalStyle;
+      document.body.style.touchAction = originalTouch;
+    };
+  }, []);
+
   // Initialize visitor UUID and load cached signs from localStorage
   useEffect(() => {
     initVisitor();
@@ -74,7 +88,7 @@ export default function ImmersiveWorld() {
       
       {isWorldReady && (
         <>
-          <ControlsGuide />
+          {!isMobile && <ControlsGuide />}
           <HUD />
           <OverlayPanel />
           <Inventory />

@@ -77,14 +77,15 @@ export function ControlsGuide() {
             Welcome to Nikhil&apos;s<br />Immersive Portfolio
           </div>
 
-          <div className="w-full flex flex-col gap-3">
-            {currentControls.map(({ key, desc }) => (
+          <div className="w-full flex flex-col gap-4">
+            {CONTROLS.map(({ key, desc }) => (
               <div
                 key={key}
-                className="flex items-center justify-between gap-4"
+                className="flex items-start justify-between gap-4"
                 style={{
                   fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: isMobile ? 10 : 11,
+                  fontSize: 11,
+                  lineHeight: '1.4'
                 }}
               >
                 <kbd style={{
@@ -93,12 +94,13 @@ export function ControlsGuide() {
                   borderRadius: 3,
                   padding: '2px 8px',
                   color: '#eee',
-                  fontSize: isMobile ? 9 : 10,
-                  whiteSpace: 'nowrap'
+                  fontSize: 10,
+                  whiteSpace: 'nowrap',
+                  marginTop: '1px'
                 }}>
                   {key}
                 </kbd>
-                <span className="text-right flex-1 truncate" style={{ color: '#aaa' }}>{desc}</span>
+                <span className="text-right flex-1" style={{ color: '#aaa', wordBreak: 'break-word' }}>{desc}</span>
               </div>
             ))}
           </div>
