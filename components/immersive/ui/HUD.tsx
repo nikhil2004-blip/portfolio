@@ -69,7 +69,7 @@ export function HUD() {
           </button>
           <button
             onClick={triggerNightMode}
-            title={isNight ? 'Switch to Day' : 'Switch to Night'}
+            title={isNight ? 'Switch to Day (N)' : 'Switch to Night (N)'}
             style={{
               background: 'none',
               border: 'none',

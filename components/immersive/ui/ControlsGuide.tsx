@@ -9,8 +9,7 @@ const CONTROLS = [
   { key: 'Shift',      desc: 'Sprint (for when HR gives you 30 seconds)' },
   { key: 'E',          desc: 'Enter buildings to see my actual work' },
   { key: 'ESC',        desc: 'Release your cursor from my hostage situation' },
-  { key: 'M',          desc: 'Toggle minimap (if you somehow get lost)' },
-  { key: '1-7',        desc: 'Select hotbar item (yes, there is an inventory)' },
+  { key: 'N',          desc: 'Toggle night mode (vampires not included)' },
   { key: 'Right Click',desc: 'Place signboard and leave a message!' }
 ];
 

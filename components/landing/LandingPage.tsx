@@ -202,10 +202,10 @@ export default function LandingPage() {
               transition={{ duration: 0.8, delay: 0.3, ease: [0.76, 0, 0.24, 1] }}
               className="lg:pl-16 xl:pl-32"
             >
-              <h1 className="text-[14vw] sm:text-[12vw] lg:text-[5rem] xl:text-[6.5rem] font-black leading-[0.85] tracking-tighter text-white uppercase mix-blend-difference mb-4 relative">
+              <h1 className="text-[12vw] xs:text-[13vw] sm:text-[12vw] lg:text-[5rem] xl:text-[6.5rem] font-black leading-[0.95] sm:leading-[0.85] tracking-tighter text-white uppercase mix-blend-difference mb-4 relative">
                 Nikhil <br />
                 Kumar <br />
-                <span className="text-transparent" style={{ WebkitTextStroke: '2px #D4FF00' }}>Yadav.</span>
+                <span className="text-transparent" style={{ WebkitTextStroke: 'min(1.5px, 0.4vw) #D4FF00' }}>Yadav.</span>
                 
                 {/* Responsive measurement lines */}
                 <div className="absolute -left-6 lg:-left-12 top-0 bottom-0 w-px bg-gradient-to-b from-[#D4FF00]/50 to-transparent hidden md:block"></div>
