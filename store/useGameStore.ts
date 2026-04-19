@@ -30,6 +30,7 @@ interface GameState {
   breakingSignId: string | null;
   globalGuestbookOpen: boolean;
   isMobile: boolean;
+  isWorldReady: boolean;
   isAdminMode: boolean;
 
   // ── actions ─────────────────────────────────────
@@ -80,6 +81,7 @@ export const useGameStore = create<GameState>()(
   breakingSignId: null,
   globalGuestbookOpen: false,
   isMobile: false,
+  isWorldReady: false,
   isAdminMode: false,
 
   setNearbyBuilding: (id) => set({ nearbyBuilding: id }),

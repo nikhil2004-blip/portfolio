@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { useRef, useEffect, useCallback, useMemo, RefObject } from 'react';
 import { PointerLockControls } from '@react-three/drei';
 import { useControls, ControlState } from './useControls';
 import { useMovement } from './useMovement';
@@ -172,15 +172,20 @@ export function Player({ controls }: { controls: RefObject<ControlState> }) {
       // Check for lock OR mobile
       if (!isMobile && !document.pointerLockElement) return;
       
-      const isRightClick = (e instanceof MouseEvent && e.button === 2);
-      const isLeftClick = (e instanceof MouseEvent && e.button === 0) || (e instanceof TouchEvent);
+      const isMouseEvent = e instanceof MouseEvent;
+      const button = isMouseEvent ? (e as MouseEvent).button : 0; // Default to left-click for touch
+
+      if (!isMobile && isMouseEvent && button !== 0 && button !== 2) return;
+      
+      const isRightClick = isMouseEvent && button === 2;
+      const isLeftClick = (isMouseEvent && button === 0) || (e instanceof TouchEvent);
 
       const state = useGameStore.getState();
       const clicked = doRaycast();
 
       if (clicked) {
          if (clicked.uid === state.visitorId) {
-           if (e.button === 2) {
+           if (button === 2) {
              // Right click down - start breaking/editing
              state.setBreakingSignId(clicked.id);
              currentBreakingId = clicked.id;
@@ -196,7 +201,7 @@ export function Player({ controls }: { controls: RefObject<ControlState> }) {
       }
 
       // No sign clicked. If Left Click (button 0) + Slot 7: Place
-      if (e.button === 0 && state.activeSlot === 7) {
+      if (button === 0 && state.activeSlot === 7) {
         const mySigns = convexSigns.filter(s => s.uid === state.visitorId);
         if (mySigns.length < 2) {
           const dir = new THREE.Vector3();
@@ -211,8 +216,11 @@ export function Player({ controls }: { controls: RefObject<ControlState> }) {
       }
     };
 
-    const onMouseUp = (e: MouseEvent) => {
-      if (e.button === 2 && currentBreakingId) {
+    const onMouseUp = (e: MouseEvent | TouchEvent) => {
+      const isMouseEvent = e instanceof MouseEvent;
+      const button = isMouseEvent ? (e as MouseEvent).button : 0;
+
+      if (button === 2 && currentBreakingId) {
         if (breakingTimer) clearTimeout(breakingTimer);
         useGameStore.getState().setBreakingSignId(null);
         
