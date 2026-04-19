@@ -66,6 +66,7 @@ export function SignModal() {
       if (editingSignId) {
          await updateSign({
            id: editingSignId as any,
+           uid: visitorId,
            name: finalName,
            message: finalMessage,
          });

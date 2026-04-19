@@ -9,5 +9,5 @@ export default defineSchema({
     position: v.array(v.number()), // [x, y, z]
     rotationY: v.number(),
     placedAt: v.string(),
-  }),
+  }).index("by_uid", ["uid"]),
 });

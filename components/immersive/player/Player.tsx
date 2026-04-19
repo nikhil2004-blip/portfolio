@@ -169,7 +169,7 @@ export function Player() {
              state.setBreakingSignId(clicked.id);
              currentBreakingId = clicked.id;
              breakingTimer = setTimeout(() => {
-                removeSignConvex({ id: clicked.id as any });
+                removeSignConvex({ id: clicked.id as any, uid: state.visitorId });
                 useGameStore.getState().setBreakingSignId(null);
                 currentBreakingId = null;
              }, 350); // Snappier 350ms long press
