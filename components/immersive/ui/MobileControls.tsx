@@ -12,61 +12,11 @@ export function MobileControls({ controls }: Props) {
   const isMobile = useGameStore(s => s.isMobile);
   const overlayOpen = useGameStore(s => s.overlayOpen);
   const signboardOpen = useGameStore(s => s.signboardOpen);
-  
-  // Joystick State
   const joystickBaseRef = useRef<HTMLDivElement>(null);
   const joystickHandleRef = useRef<HTMLDivElement>(null);
-  
-  // Static center (relative to base)
   const [active, setActive] = useState(false);
-
-  // Reset joystick when overlays open or mobile status changes
-  useEffect(() => {
-    if (overlayOpen || signboardOpen) {
-      handleJoystickEnd();
-    }
-  }, [overlayOpen, signboardOpen]);
-
-  if (!isMobile) return null;
-
-  const handleJoystickMove = (e: React.PointerEvent) => {
-    if (overlayOpen || signboardOpen || !controls.current || !joystickBaseRef.current) return;
-    
-    // Calculate relative to the static base center
-    const rect = joystickBaseRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    const dx = e.clientX - centerX;
-    const dy = e.clientY - centerY;
-    
-    // Guard against zeroed coordinates or invalid center calculation
-    if (e.clientX === 0 && e.clientY === 0) return;
-    if (rect.width === 0) return;
-
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    const maxDist = 40;
-    
-    const limitedDist = Math.min(dist, maxDist);
-    const angle = Math.atan2(dy, dx);
-    const lx = Math.cos(angle) * limitedDist;
-    const ly = Math.sin(angle) * limitedDist;
-
-    if (joystickHandleRef.current) {
-      joystickHandleRef.current.style.transform = `translate(${lx}px, ${ly}px)`;
-    }
-
-    // Set controls based on joystick vector
-    const threshold = 15;
-    controls.current.w = ly < -threshold;
-    controls.current.s = ly > threshold;
-    controls.current.a = lx < -threshold;
-    controls.current.d = lx > threshold;
-    
-    controls.current.joystickX = lx / maxDist;
-    controls.current.joystickY = ly / maxDist;
-  };
-
+  
+  // Define handlers at the top to avoid TDZ issues with early returns and useEffect
   const handleJoystickEnd = () => {
     setActive(false);
     if (joystickHandleRef.current) {
@@ -81,6 +31,49 @@ export function MobileControls({ controls }: Props) {
       controls.current.joystickY = 0;
     }
   };
+
+  const handleJoystickMove = (e: React.PointerEvent) => {
+    if (!controls.current || !joystickBaseRef.current) return;
+    
+    const rect = joystickBaseRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const dx = e.clientX - centerX;
+    const dy = e.clientY - centerY;
+    
+    if (e.clientX === 0 && e.clientY === 0) return;
+    if (rect.width === 0) return;
+
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const maxDist = 40;
+    const limitedDist = Math.min(dist, maxDist);
+    const angle = Math.atan2(dy, dx);
+    const lx = Math.cos(angle) * limitedDist;
+    const ly = Math.sin(angle) * limitedDist;
+
+    if (joystickHandleRef.current) {
+      joystickHandleRef.current.style.transform = `translate(${lx}px, ${ly}px)`;
+    }
+
+    const threshold = 15;
+    controls.current.w = ly < -threshold;
+    controls.current.s = ly > threshold;
+    controls.current.a = lx < -threshold;
+    controls.current.d = lx > threshold;
+    
+    controls.current.joystickX = lx / maxDist;
+    controls.current.joystickY = ly / maxDist;
+  };
+
+  useEffect(() => {
+    if (overlayOpen || signboardOpen) {
+      handleJoystickEnd();
+    }
+  }, [overlayOpen, signboardOpen]);
+
+  if (!isMobile) return null;
+
 
   return (
     <div className={`fixed inset-0 z-[1000] pointer-events-none select-none transition-opacity duration-300 ${overlayOpen ? 'opacity-0' : 'opacity-100'}`}>
