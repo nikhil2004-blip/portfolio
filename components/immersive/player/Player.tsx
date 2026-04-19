@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useMemo } from 'react';
 import { PointerLockControls } from '@react-three/drei';
 import { useKeyboard } from './useKeyboard';
 import { useMovement } from './useMovement';
@@ -130,7 +130,8 @@ export function Player() {
   // Primary click logic (when pointer locked)
   const { scene } = useThree();
   const removeSignConvex = useMutation(api.signs.remove);
-  const convexSigns = useQuery(api.signs.get) || [];
+  const rawSigns = useQuery(api.signs.get);
+  const convexSigns = useMemo(() => rawSigns || [], [rawSigns]);
   
   useEffect(() => {
     let breakingTimer: NodeJS.Timeout | null = null;

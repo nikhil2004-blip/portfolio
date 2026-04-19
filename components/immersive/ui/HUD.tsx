@@ -1,5 +1,6 @@
 'use client';
 import { useGameStore } from '@/store/useGameStore';
+import Link from 'next/link';
 import { Crosshair } from './Crosshair';
 import { InteractPrompt } from './InteractPrompt';
 
@@ -47,8 +48,25 @@ export function HUD() {
           </span>
         </div>
 
-        {/* Right: ESC hint + Night toggle */}
+        {/* Right: ESC hint + Home + Night toggle */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <button
+            onClick={() => window.location.replace('/')}
+            style={{
+              background: 'none',
+              border: '1px solid #333',
+              padding: '1px 6px',
+              borderRadius: '2px',
+              color: '#888',
+              fontSize: 10,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              textTransform: 'uppercase'
+            }}
+            className="hover:text-white transition-colors"
+          >
+            HOME
+          </button>
           <button
             onClick={triggerNightMode}
             title={isNight ? 'Switch to Day' : 'Switch to Night'}

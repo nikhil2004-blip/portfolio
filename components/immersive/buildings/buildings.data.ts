@@ -11,7 +11,7 @@ export const BUILDINGS: BuildingData[] = [
     size: { w: 9, h: 11, d: 9 },
     triggerRadius: 6.5,
     collider: { minX: -24.8, maxX: -15.2, minZ: -22.8, maxZ: -13.8 },
-    doorSide: 'south',
+    doorSide: 'east',
     style: 'medieval',
   },
   {
@@ -23,7 +23,7 @@ export const BUILDINGS: BuildingData[] = [
     size: { w: 11, h: 10, d: 9 },
     triggerRadius: 7,
     collider: { minX: 14.2, maxX: 25.8, minZ: -22.8, maxZ: -13.8 },
-    doorSide: 'south',
+    doorSide: 'west',
     style: 'industrial',
   },
   {
@@ -35,7 +35,7 @@ export const BUILDINGS: BuildingData[] = [
     size: { w: 9, h: 11, d: 9 },
     triggerRadius: 6.5,
     collider: { minX: -24.8, maxX: -15.2, minZ: 3.2, maxZ: 12.2 },
-    doorSide: 'south',
+    doorSide: 'east',
     style: 'japanese',
   },
   {
@@ -47,7 +47,7 @@ export const BUILDINGS: BuildingData[] = [
     size: { w: 8, h: 10, d: 8 },
     triggerRadius: 6,
     collider: { minX: 15.7, maxX: 24.3, minZ: 3.7, maxZ: 12.3 },
-    doorSide: 'south',
+    doorSide: 'west',
     style: 'japanese',
   },
   {
@@ -59,7 +59,7 @@ export const BUILDINGS: BuildingData[] = [
     size: { w: 10, h: 12, d: 9 },
     triggerRadius: 6.5,
     collider: { minX: -19.3, maxX: -8.7, minZ: 23.2, maxZ: 32.8 },
-    doorSide: 'south',
+    doorSide: 'east',
     style: 'chinese',
   },
   {
@@ -71,7 +71,7 @@ export const BUILDINGS: BuildingData[] = [
     size: { w: 8, h: 10, d: 8 },
     triggerRadius: 6,
     collider: { minX: 9.7, maxX: 18.3, minZ: 23.7, maxZ: 32.3 },
-    doorSide: 'south',
+    doorSide: 'west',
     style: 'medieval',
   },
   {

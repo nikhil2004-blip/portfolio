@@ -31,33 +31,41 @@ export function useProximity() {
     let closestDist = Infinity;
 
     for (const b of BUILDINGS) {
-      const dx   = camera.position.x - b.position[0];
-      const dz   = camera.position.z - b.position[2];
+      // Calculate the specific "gate" position based on building orientation
+      let gateX = b.position[0];
+      let gateZ = b.position[2];
+
+      const halfW = b.size.w / 2;
+      const halfD = b.size.d / 2;
+
+      if (b.doorSide === 'east') gateX += halfW;
+      else if (b.doorSide === 'west') gateX -= halfW;
+      else if (b.doorSide === 'south') gateZ += halfD;
+      else if (b.doorSide === 'north') gateZ -= halfD;
+
+      const dx   = camera.position.x - gateX;
+      const dz   = camera.position.z - gateZ;
       const dist = Math.sqrt(dx * dx + dz * dz);
 
-      if (dist < b.triggerRadius && dist < closestDist) {
+      // Proximity for the HUD prompt (showing building name)
+      // We use a 4.5 unit radius around the gate specifically
+      if (dist < 4.5 && dist < closestDist) {
         closest     = b.id;
         closestDist = dist;
       }
 
-      // Use dynamic auto-enter radius based on building size. 
-      // Made larger so the player easily enters when bumping against the building
-      const maxDim = Math.max(b.size.w, b.size.d) / 2;
-      const autoEnterRadius = maxDim + 2.5; 
-      const autoResetRadius = autoEnterRadius + 1.5;
+      // AUTO-ENTER: We only open the building if the player is right at the gate
+      const autoEnterRadius = 2.0; 
+      const autoResetRadius = 5.0;
 
-      // AUTO-ENTER: If extremely close (inside the autoEnter limit)
-      // and NOT the building we just closed (unless we moved away and came back)
       if (dist < autoEnterRadius && closest === b.id && lastClosedBuildingRef.current !== b.id) {
           openBuilding(b.id);
-          // Release mouse immediately for cinematic entry
           if (document.pointerLockElement) {
             document.exitPointerLock();
           }
           return;
       }
 
-      // Reset the "last closed" filter if we moved away from it
       if (lastClosedBuildingRef.current === b.id && dist > autoResetRadius) {
           lastClosedBuildingRef.current = null;
       }

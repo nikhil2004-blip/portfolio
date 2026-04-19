@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { subscribeWithSelector } from 'zustand/middleware';
 
 interface PendingSign {
   position: [number, number, number];
@@ -28,6 +29,7 @@ interface GameState {
   activeSlot: number;
   breakingSignId: string | null;
   globalGuestbookOpen: boolean;
+  isWorldReady: boolean;
 
   // ── actions ─────────────────────────────────────
   setNearbyBuilding: (id: string | null) => void;
@@ -47,13 +49,15 @@ interface GameState {
   setActiveSlot: (slot: number) => void;
   setBreakingSignId: (id: string | null) => void;
   setGlobalGuestbookOpen: (isOpen: boolean) => void;
+  setIsWorldReady: (ready: boolean) => void;
 }
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
-export const useGameStore = create<GameState>((set, get) => ({
+export const useGameStore = create<GameState>()(
+  subscribeWithSelector((set, get) => ({
   nearbyBuilding: null,
   activeBuilding: null,
   overlayOpen: false,
@@ -72,6 +76,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   activeSlot: 0,
   breakingSignId: null,
   globalGuestbookOpen: false,
+  isWorldReady: false,
 
   setNearbyBuilding: (id) => set({ nearbyBuilding: id }),
 
@@ -133,4 +138,6 @@ export const useGameStore = create<GameState>((set, get) => ({
   setBreakingSignId: (id) => set({ breakingSignId: id }),
 
   setGlobalGuestbookOpen: (isOpen) => set({ globalGuestbookOpen: isOpen, overlayOpen: isOpen }),
-}));
+
+  setIsWorldReady: (ready) => set({ isWorldReady: ready }),
+})));
