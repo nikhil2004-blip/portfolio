@@ -11,8 +11,14 @@ import { InteractPrompt } from './InteractPrompt';
  * Bottom: interact prompt (conditional).
  */
 export function HUD() {
-  const { nearbyBuilding, overlayOpen, audioEnabled, toggleAudio, isNight, triggerNightMode, isTransitioningNight, setGlobalGuestbookOpen } =
-    useGameStore();
+  const nearbyBuilding = useGameStore(s => s.nearbyBuilding);
+  const overlayOpen = useGameStore(s => s.overlayOpen);
+  const audioEnabled = useGameStore(s => s.audioEnabled);
+  const toggleAudio = useGameStore(s => s.toggleAudio);
+  const isNight = useGameStore(s => s.isNight);
+  const triggerNightMode = useGameStore(s => s.triggerNightMode);
+  const isTransitioningNight = useGameStore(s => s.isTransitioningNight);
+  const setGlobalGuestbookOpen = useGameStore(s => s.setGlobalGuestbookOpen);
 
   if (overlayOpen) return null;
 

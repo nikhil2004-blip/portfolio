@@ -10,7 +10,8 @@ import { Building } from 'lucide-react';
  * then switches to "[ E ] Enter — Building Name" when near a building.
  */
 export function InteractPrompt() {
-  const { nearbyBuilding, overlayOpen } = useGameStore();
+  const nearbyBuilding = useGameStore(s => s.nearbyBuilding);
+  const overlayOpen = useGameStore(s => s.overlayOpen);
   const [showHint, setShowHint] = useState(false);
 
   // Show the intro hint 1.5s after mount, hide after 6s

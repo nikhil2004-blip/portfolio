@@ -14,7 +14,10 @@ const BLOCKS = [
 ];
 
 export function Inventory() {
-  const { overlayOpen, activeSlot, setActiveSlot, visitorId } = useGameStore();
+  const overlayOpen = useGameStore(s => s.overlayOpen);
+  const activeSlot = useGameStore(s => s.activeSlot);
+  const setActiveSlot = useGameStore(s => s.setActiveSlot);
+  const visitorId = useGameStore(s => s.visitorId);
   const convexSigns = useQuery(api.signs.get) || [];
 
   if (overlayOpen) return null;

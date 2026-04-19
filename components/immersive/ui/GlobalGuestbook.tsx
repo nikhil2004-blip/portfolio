@@ -5,13 +5,11 @@ import { api } from '@/convex/_generated/api';
 import { useEffect, useRef, useMemo } from 'react';
 
 export function GlobalGuestbook() {
-  const { 
-    globalGuestbookOpen, 
-    setGlobalGuestbookOpen, 
-    visitorId, 
-    isAdminMode, 
-    toggleAdminMode 
-  } = useGameStore();
+  const globalGuestbookOpen = useGameStore(s => s.globalGuestbookOpen);
+  const setGlobalGuestbookOpen = useGameStore(s => s.setGlobalGuestbookOpen);
+  const visitorId = useGameStore(s => s.visitorId);
+  const isAdminMode = useGameStore(s => s.isAdminMode);
+  const toggleAdminMode = useGameStore(s => s.toggleAdminMode);
   
   const allSigns = useQuery(api.signs.get) || [];
   

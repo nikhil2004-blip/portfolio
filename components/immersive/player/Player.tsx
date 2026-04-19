@@ -22,10 +22,13 @@ export function Player() {
   const controlsRef = useRef<any>(null);
   const keys = useKeyboard();
 
-  const { 
-    nearbyBuilding, overlayOpen, openBuilding, closeBuilding, activeSlot, 
-    globalGuestbookOpen, signboardOpen 
-  } = useGameStore();
+  const nearbyBuilding = useGameStore(s => s.nearbyBuilding);
+  const overlayOpen = useGameStore(s => s.overlayOpen);
+  const openBuilding = useGameStore(s => s.openBuilding);
+  const closeBuilding = useGameStore(s => s.closeBuilding);
+  const activeSlot = useGameStore(s => s.activeSlot);
+  const globalGuestbookOpen = useGameStore(s => s.globalGuestbookOpen);
+  const signboardOpen = useGameStore(s => s.signboardOpen);
 
   // Set spawn position only once when first loading
   useEffect(() => {
@@ -169,7 +172,7 @@ export function Player() {
                 removeSignConvex({ id: clicked.id as any });
                 useGameStore.getState().setBreakingSignId(null);
                 currentBreakingId = null;
-             }, 600); // 600ms for long press
+             }, 350); // Snappier 350ms long press
              return;
            }
          }

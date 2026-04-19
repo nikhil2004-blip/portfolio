@@ -5,7 +5,11 @@ import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
 export function SignModal() {
-  const { signboardOpen, setSignboardOpen, visitorId, editingSignId, pendingSign } = useGameStore();
+  const signboardOpen = useGameStore(s => s.signboardOpen);
+  const setSignboardOpen = useGameStore(s => s.setSignboardOpen);
+  const visitorId = useGameStore(s => s.visitorId);
+  const editingSignId = useGameStore(s => s.editingSignId);
+  const pendingSign = useGameStore(s => s.pendingSign);
   const rawConvexSigns = useQuery(api.signs.get);
   const convexSigns = React.useMemo(() => rawConvexSigns || [], [rawConvexSigns]);
   const addSign = useMutation(api.signs.add);
@@ -81,7 +85,7 @@ export function SignModal() {
         setName('');
         setMessage('');
         setStatus('idle');
-      }, 1800);
+      }, 200);
     } catch (err) {
       setStatus('error');
       setErrorText('Failed to sync sign to the global server.');

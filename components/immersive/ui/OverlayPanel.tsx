@@ -24,7 +24,9 @@ const BUILDING_LABELS: Record<string, { title: string; subtitle: string; color: 
 };
 
 export function OverlayPanel() {
-  const { overlayOpen, activeBuilding, closeBuilding } = useGameStore();
+  const overlayOpen = useGameStore(s => s.overlayOpen);
+  const activeBuilding = useGameStore(s => s.activeBuilding);
+  const closeBuilding = useGameStore(s => s.closeBuilding);
   const panelRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [clock, setClock] = useState('');
