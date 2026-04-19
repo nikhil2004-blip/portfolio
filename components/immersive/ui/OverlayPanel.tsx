@@ -32,6 +32,8 @@ export function OverlayPanel() {
   const [clock, setClock] = useState('');
   const [copiedHUD, setCopiedHUD] = useState(false);
 
+  const [contentReady, setContentReady] = useState(false);
+
   // Tick clock every second
   useEffect(() => {
     setMounted(true);
@@ -42,9 +44,20 @@ export function OverlayPanel() {
     return () => clearInterval(id);
   }, []);
 
+  // Defer the heavy DOM render slightly so WebGL pointer lock release doesn't stutter
   useEffect(() => {
-    if (overlayOpen && panelRef.current) panelRef.current.focus();
+    let timer: NodeJS.Timeout;
+    if (overlayOpen) {
+      timer = setTimeout(() => setContentReady(true), 100);
+    } else {
+      setContentReady(false);
+    }
+    return () => clearTimeout(timer);
   }, [overlayOpen]);
+
+  useEffect(() => {
+    if (overlayOpen && panelRef.current && contentReady) panelRef.current.focus();
+  }, [overlayOpen, contentReady]);
 
   const handleClose = () => {
     closeBuilding();
@@ -142,7 +155,7 @@ export function OverlayPanel() {
             <div className="mt-2 h-px w-full" style={{ background: `linear-gradient(to right, ${accentColor}80, transparent)` }} />
           </motion.div>
 
-          {/* Scrollable content */}
+          {/* Scrollable content (Deferred!) */}
           <motion.div
             ref={panelRef}
             tabIndex={-1}
@@ -156,13 +169,17 @@ export function OverlayPanel() {
             className="relative flex-1 overflow-y-auto px-8 pb-8 outline-none custom-scrollbar cursor-default"
             style={{ zIndex: 3 }}
           >
-            {activeBuilding === 'about' && <AboutPanel accentColor={accentColor} />}
-            {activeBuilding === 'projects' && <ProjectsPanel accentColor={accentColor} />}
-            {activeBuilding === 'skills' && <SkillsPanel accentColor={accentColor} />}
-            {activeBuilding === 'tools' && <ToolsPanel accentColor={accentColor} />}
-            {activeBuilding === 'leadership' && <LeadershipPanel accentColor={accentColor} />}
-            {activeBuilding === 'contact' && <ContactPanel accentColor={accentColor} />}
-            {activeBuilding === 'anomaly' && <AnomalyPanel accentColor={accentColor} />}
+            {contentReady && (
+              <>
+                {activeBuilding === 'about' && <AboutPanel accentColor={accentColor} />}
+                {activeBuilding === 'projects' && <ProjectsPanel accentColor={accentColor} />}
+                {activeBuilding === 'skills' && <SkillsPanel accentColor={accentColor} />}
+                {activeBuilding === 'tools' && <ToolsPanel accentColor={accentColor} />}
+                {activeBuilding === 'leadership' && <LeadershipPanel accentColor={accentColor} />}
+                {activeBuilding === 'contact' && <ContactPanel accentColor={accentColor} />}
+                {activeBuilding === 'anomaly' && <AnomalyPanel accentColor={accentColor} />}
+              </>
+            )}
           </motion.div>
 
           {/* Bottom HUD bar */}
