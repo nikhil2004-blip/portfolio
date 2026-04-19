@@ -108,7 +108,7 @@ export function OverlayPanel() {
                 Switch to Minimal
               </button>
               <span className="font-monocraft text-xs" style={{ color: `${accentColor}60` }}>
-                {clock}
+                {mounted ? clock : '--:--:--'}
               </span>
               <button
                 onClick={handleClose}

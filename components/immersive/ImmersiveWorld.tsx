@@ -1,7 +1,7 @@
 'use client';
+import { useState, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Sky, Stars, Sparkles } from '@react-three/drei';
-import { useEffect } from 'react';
+import { Sky, Stars, Sparkles, useProgress } from '@react-three/drei';
 // Oh wait, the PRD said custom collision Math for performance! We won't use Rapier.
 
 import { Player } from './player/Player';
@@ -14,7 +14,6 @@ import { BUILDINGS } from './buildings/buildings.data';
 
 import { HUD } from './ui/HUD';
 import { OverlayPanel } from './ui/OverlayPanel';
-import { LoadingScreen } from './ui/LoadingScreen';
 import { ControlsGuide } from './ui/ControlsGuide';
 import { Inventory } from './ui/Inventory';
 import { SignModal } from './ui/SignModal';
@@ -27,25 +26,43 @@ export default function ImmersiveWorld() {
   const overlayOpen = useGameStore((s) => s.overlayOpen);
   const isNight = useGameStore((s) => s.isNight);
   const initVisitor = useGameStore((s) => s.initVisitor);
+  const isWorldReady = useGameStore((s) => s.isWorldReady);
+  const setIsWorldReady = useGameStore((s) => s.setIsWorldReady);
+  
+  const { progress } = useProgress();
+  const [canvasReady, setCanvasReady] = useState(false);
 
   // Initialize visitor UUID and load cached signs from localStorage
   useEffect(() => {
     initVisitor();
   }, [initVisitor]);
 
-  const bgColor = isNight ? '#0B1026' : '#87CEEB';
+  // Handle loading state: wait for both 3D assets AND the WebGL context to be ready
+  useEffect(() => {
+    if (progress === 100 && canvasReady) {
+      // Small 200ms grace period for the first frame to stabilize
+      const timer = setTimeout(() => setIsWorldReady(true), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [progress, canvasReady, setIsWorldReady]);
+
+  const targetBg = isNight ? '#0B1026' : '#87CEEB';
+  const bgColor = isWorldReady ? targetBg : '#000000';
 
   return (
     <div className="w-full h-screen overflow-hidden" style={{ backgroundColor: bgColor, transition: 'background-color 1s ease-in-out' }}>
-      {/* 2D UI Overlays */}
-      <LoadingScreen />
-      <ControlsGuide />
-      <HUD />
-      <OverlayPanel />
-      <Inventory />
-      <SignModal />
-      <NightTransitionScreen />
-      <GlobalGuestbook />
+      
+      {isWorldReady && (
+        <>
+          <ControlsGuide />
+          <HUD />
+          <OverlayPanel />
+          <Inventory />
+          <SignModal />
+          <NightTransitionScreen />
+          <GlobalGuestbook />
+        </>
+      )}
 
       {/* 3D Canvas (Lock Target) */}
       <div id="game-canvas-container" className="absolute inset-0">
@@ -54,6 +71,7 @@ export default function ImmersiveWorld() {
           shadows={false}
           camera={{ fov: 75, near: 0.1, far: 500 }}
           style={{ touchAction: 'none' }} // Prevent scrolling on mobile
+          onCreated={() => setCanvasReady(true)}
         >
           <color attach="background" args={[bgColor]} />
         

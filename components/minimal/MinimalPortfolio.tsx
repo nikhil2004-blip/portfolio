@@ -28,11 +28,13 @@ const SectionHeader = ({ title, index }: { title: string; index: string }) => (
 
 export default function MinimalPortfolio() {
   const [activeSection, setActiveSection] = useState('about');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const observerOptions = {
       root: null,
-      rootMargin: '-20% 0px -70% 0px',
+      rootMargin: '-40% 0px -40% 0px',
       threshold: 0
     };
 
@@ -87,6 +89,7 @@ export default function MinimalPortfolio() {
                 onClick={() => {
                   const el = document.getElementById(section);
                   if (el) {
+                    setActiveSection(section);
                     el.scrollIntoView({ behavior: 'smooth' });
                     // Use replaceState to avoid polluting history with hashes
                     window.history.replaceState(null, '', `#${section}`);
@@ -255,7 +258,7 @@ export default function MinimalPortfolio() {
           {/* Footer */}
           <footer className="pt-12 pb-32 border-t border-zinc-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="text-xs text-zinc-500 tracking-wide font-medium">
-              © {new Date().getFullYear()} Nikhil Kumar Yadav.
+              © {mounted ? new Date().getFullYear() : '2026'} Nikhil Kumar Yadav.
             </div>
             <div className="flex items-center gap-6 text-xs font-bold text-zinc-500 tracking-widest uppercase">
               <a href={contact.github} className="hover:text-zinc-100 transition-colors">GitHub</a>
