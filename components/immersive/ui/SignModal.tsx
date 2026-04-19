@@ -259,7 +259,7 @@ export function SignModal() {
 
           {/* Slot info */}
           <div style={{ color: 'rgba(160,98,42,0.6)', fontSize: 10, marginBottom: 12 }}>
-            Placing sign #{currentSlotNumber} of 2 · visible to everyone globally
+            Placing sign #{currentSlotNumber} of 2 · visible only to you and owner (Ghost Mode)
           </div>
 
           {/* Buttons */}

@@ -30,6 +30,7 @@ interface GameState {
   breakingSignId: string | null;
   globalGuestbookOpen: boolean;
   isWorldReady: boolean;
+  isAdminMode: boolean;
 
   // ── actions ─────────────────────────────────────
   setNearbyBuilding: (id: string | null) => void;
@@ -50,6 +51,7 @@ interface GameState {
   setBreakingSignId: (id: string | null) => void;
   setGlobalGuestbookOpen: (isOpen: boolean) => void;
   setIsWorldReady: (ready: boolean) => void;
+  toggleAdminMode: () => void;
 }
 
 function generateId(): string {
@@ -77,6 +79,7 @@ export const useGameStore = create<GameState>()(
   breakingSignId: null,
   globalGuestbookOpen: false,
   isWorldReady: false,
+  isAdminMode: false,
 
   setNearbyBuilding: (id) => set({ nearbyBuilding: id }),
 
@@ -140,4 +143,6 @@ export const useGameStore = create<GameState>()(
   setGlobalGuestbookOpen: (isOpen) => set({ globalGuestbookOpen: isOpen, overlayOpen: isOpen }),
 
   setIsWorldReady: (ready) => set({ isWorldReady: ready }),
+
+  toggleAdminMode: () => set((s) => ({ isAdminMode: !s.isAdminMode })),
 })));

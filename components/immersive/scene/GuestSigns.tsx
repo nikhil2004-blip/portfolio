@@ -1,10 +1,9 @@
 'use client';
+import { useRef, useMemo } from 'react';
 import { Text } from '@react-three/drei';
 import { useGameStore } from '@/store/useGameStore';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-
-import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -103,8 +102,16 @@ function SignItem({ sign, breakingSignId }: { sign: any; breakingSignId: string 
 }
 
 export function GuestSigns() {
-  const convexSigns = useQuery(api.signs.get) || [];
+  const visitorId = useGameStore(s => s.visitorId);
+  const isAdminMode = useGameStore(s => s.isAdminMode);
+  const rawSigns = useQuery(api.signs.get);
   const breakingSignId = useGameStore((state) => state.breakingSignId);
+  
+  const convexSigns = useMemo(() => {
+    if (!rawSigns) return [];
+    // Only show signs if Admin Mode is ON or if the sign belongs to the current visitor
+    return rawSigns.filter(s => isAdminMode || s.uid === visitorId);
+  }, [rawSigns, isAdminMode, visitorId]);
 
   return (
     <group>
