@@ -35,7 +35,7 @@ A cinematic, interactive 3D portfolio experience built with **Next.js**, **Three
    ```
 
 2. **Setup Environment**:
-   Copy `.env.example` to `.env.local` and fill in your Convex and GitHub credentials.
+   Copy `.env.example` to `.env.local` and fill in your Convex credentials.
 
 3. **Install dependencies**:
    ```bash
