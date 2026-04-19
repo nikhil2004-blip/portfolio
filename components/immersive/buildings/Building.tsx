@@ -5,13 +5,13 @@ import type { BuildingData } from '@/types/building';
 import { useGameStore } from '@/store/useGameStore';
 import { BUILDINGS } from './buildings.data';
 
-interface Props extends Pick<BuildingData, 'position' | 'size' | 'name' | 'accentColor' | 'id'> {}
+interface Props extends Pick<BuildingData, 'position' | 'size' | 'name' | 'accentColor' | 'id' | 'doorSide'> {}
 
 /**
  * Building — A procedurally generated voxel structure that changes
  * style (Medieval, Industrial, Japanese, Chinese) based on its data.
  */
-export function Building({ position, size, name, accentColor, id }: Props) {
+export function Building({ position, size, name, accentColor, id, doorSide }: Props) {
   const { w, h, d } = size;
   const cx = (w - 1) / 2;
   const cz = (d - 1) / 2;
@@ -90,7 +90,9 @@ export function Building({ position, size, name, accentColor, id }: Props) {
       const isCorner = isWallX && isWallZ;
 
       let isDoor = false;
-      const doorFace = id === 'anomaly' ? 'pz' : (position[0] < 0 ? 'px' : 'nx'); // px = positive X, nx = negative X, pz = positive Z (south)
+      const doorFace = doorSide === 'east' ? 'px' : 
+                       doorSide === 'west' ? 'nx' : 
+                       doorSide === 'south' ? 'pz' : 'nz';
 
       if (doorFace === 'px' && x === w - 1) {
           isDoor = Math.abs(z - cz) <= 1;

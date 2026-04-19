@@ -109,6 +109,7 @@ export default function ImmersiveWorld() {
             size={b.size}
             name={b.name}
             accentColor={b.accentColor}
+            doorSide={b.doorSide}
           />
         ))}
 
