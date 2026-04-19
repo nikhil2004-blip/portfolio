@@ -21,6 +21,8 @@ import { NightTransitionScreen } from './ui/NightTransitionScreen';
 import { GlobalGuestbook } from './ui/GlobalGuestbook';
 
 import { useGameStore } from '@/store/useGameStore';
+import { useControls } from './player/useControls';
+import { MobileControls } from './ui/MobileControls';
 
 export default function ImmersiveWorld() {
   const overlayOpen = useGameStore((s) => s.overlayOpen);
@@ -28,9 +30,24 @@ export default function ImmersiveWorld() {
   const initVisitor = useGameStore((s) => s.initVisitor);
   const isWorldReady = useGameStore((s) => s.isWorldReady);
   const setIsWorldReady = useGameStore((s) => s.setIsWorldReady);
+  const isMobile = useGameStore((s) => s.isMobile);
+  const setIsMobile = useGameStore((s) => s.setIsMobile);
   
+  const controls = useControls();
   const { progress } = useProgress();
   const [canvasReady, setCanvasReady] = useState(false);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+      const isSmall = window.innerWidth <= 768;
+      setIsMobile(isTouch || isSmall);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [setIsMobile]);
 
   // Initialize visitor UUID and load cached signs from localStorage
   useEffect(() => {
@@ -61,6 +78,7 @@ export default function ImmersiveWorld() {
           <SignModal />
           <NightTransitionScreen />
           <GlobalGuestbook />
+          <MobileControls controls={controls} />
         </>
       )}
 
@@ -114,14 +132,16 @@ export default function ImmersiveWorld() {
         ))}
 
         {/* Player (Camera & Movement) */}
-        <Player />
+        <Player controls={controls} />
       </Canvas>
       </div>
       
-      {/* Mobile fallback / warning */}
-      <div className="md:hidden fixed bottom-4 left-4 right-4 bg-black/80 text-white p-4 rounded text-xs text-center z-[100] font-monocraft">
-        Warning: This 3D experience is designed for desktop keyboard/mouse navigation.
-      </div>
+      {/* Minimal mobile info */}
+      {!isWorldReady && (
+        <div className="md:hidden fixed bottom-4 left-4 right-4 bg-black/80 text-white p-4 rounded text-xs text-center z-[100] font-monocraft">
+          Loading mobile experience...
+        </div>
+      )}
     </div>
   );
 }

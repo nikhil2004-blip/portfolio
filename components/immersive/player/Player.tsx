@@ -1,7 +1,7 @@
 'use client';
 import { useRef, useEffect, useCallback, useMemo } from 'react';
 import { PointerLockControls } from '@react-three/drei';
-import { useKeyboard } from './useKeyboard';
+import { useControls, ControlState } from './useControls';
 import { useMovement } from './useMovement';
 import { useProximity } from './useProximity';
 import { useThree, createPortal } from '@react-three/fiber';
@@ -17,10 +17,15 @@ let spawned = false;
  * Player — the camera controller.
  * Must be placed INSIDE <Canvas>.
  */
-export function Player() {
-  const { camera } = useThree();
+export function Player({ controls }: { controls: RefObject<ControlState> }) {
+  const { camera, gl } = useThree();
   const controlsRef = useRef<any>(null);
-  const keys = useKeyboard();
+  const isMobile = useGameStore(s => s.isMobile);
+  
+  // Rotation State (Mobile)
+  const rotationRef = useRef({ yaw: 0, pitch: 0 });
+  const isRotating = useRef(false);
+  const lastTouch = useRef({ x: 0, y: 0 });
 
   const nearbyBuilding = useGameStore(s => s.nearbyBuilding);
   const overlayOpen = useGameStore(s => s.overlayOpen);
@@ -36,8 +41,14 @@ export function Player() {
       camera.position.set(SPAWN_X, PLAYER_HEIGHT, SPAWN_Z);
       camera.lookAt(0, PLAYER_HEIGHT, -5);
       spawned = true;
+      
+      // Update rotation ref for mobile after lookAt
+      if (isMobile) {
+        rotationRef.current.yaw = camera.rotation.y;
+        rotationRef.current.pitch = camera.rotation.x;
+      }
     }
-  }, [camera]);
+  }, [camera, isMobile]);
 
   const requestLock = useCallback(() => {
     // Try PointerLockControls first, then raw canvas fallback
@@ -50,13 +61,14 @@ export function Player() {
   }, []);
 
   const releaseLock = useCallback(() => {
+    if (isMobile) return;
     if (document.pointerLockElement) {
       document.exitPointerLock();
     }
     if (controlsRef.current?.unlock) {
       try { controlsRef.current.unlock(); } catch (_) {}
     }
-  }, []);
+  }, [isMobile]);
 
   // E / ESC interaction keys
   useEffect(() => {
@@ -156,8 +168,12 @@ export function Player() {
       return null;
     };
 
-    const onMouseDown = (e: MouseEvent) => {
-      if (!document.pointerLockElement || (e.button !== 0 && e.button !== 2)) return;
+    const onMouseDown = (e: MouseEvent | TouchEvent) => {
+      // Check for lock OR mobile
+      if (!isMobile && !document.pointerLockElement) return;
+      
+      const isRightClick = (e instanceof MouseEvent && e.button === 2);
+      const isLeftClick = (e instanceof MouseEvent && e.button === 0) || (e instanceof TouchEvent);
 
       const state = useGameStore.getState();
       const clicked = doRaycast();
@@ -209,15 +225,70 @@ export function Player() {
 
     window.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mouseup', onMouseUp);
+    
+    // Support mobile tapping for interaction (short tap)
+    const onTouchStart = (e: TouchEvent) => {
+      if (useGameStore.getState().overlayOpen) return;
+      onMouseDown(e);
+    };
+
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+
     return () => {
       window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('touchstart', onTouchStart);
       if (breakingTimer) clearTimeout(breakingTimer);
     };
-  }, [camera, scene, releaseLock, convexSigns, removeSignConvex]);
+  }, [camera, scene, releaseLock, convexSigns, removeSignConvex, isMobile]);
 
   // Movement each frame
-  useMovement(keys);
+  useMovement(controls);
+
+  // Mobile Rotation Logic
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const onPointerDown = (e: PointerEvent) => {
+      // Only rotate on the right half of the screen
+      if (e.clientX > window.innerWidth / 2) {
+        isRotating.current = true;
+        lastTouch.current = { x: e.clientX, y: e.clientY };
+      }
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isRotating.current) return;
+      
+      const dx = e.clientX - lastTouch.current.x;
+      const dy = e.clientY - lastTouch.current.y;
+      
+      rotationRef.current.yaw -= dx * 0.005;
+      rotationRef.current.pitch -= dy * 0.005;
+      rotationRef.current.pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationRef.current.pitch));
+      
+      lastTouch.current = { x: e.clientX, y: e.clientY };
+
+      // Apply rotation immediately to camera for mobile
+      camera.rotation.set(rotationRef.current.pitch, rotationRef.current.yaw, 0, 'YXZ');
+    };
+
+    const onPointerUp = () => {
+      isRotating.current = false;
+    };
+
+    gl.domElement.addEventListener('pointerdown', onPointerDown);
+    gl.domElement.addEventListener('pointermove', onPointerMove);
+    gl.domElement.addEventListener('pointerup', onPointerUp);
+    gl.domElement.addEventListener('pointercancel', onPointerUp);
+
+    return () => {
+      gl.domElement.removeEventListener('pointerdown', onPointerDown);
+      gl.domElement.removeEventListener('pointermove', onPointerMove);
+      gl.domElement.removeEventListener('pointerup', onPointerUp);
+      gl.domElement.removeEventListener('pointercancel', onPointerUp);
+    };
+  }, [isMobile, camera, gl]);
 
   // Proximity detection each frame
   useProximity();
@@ -243,11 +314,13 @@ export function Player() {
 
   return (
     <>
-      <PointerLockControls
-        ref={controlsRef}
-        makeDefault
-        selector="#game-canvas-container"
-      />
+      {!isMobile && (
+        <PointerLockControls
+          ref={controlsRef}
+          makeDefault
+          selector="#game-canvas-container"
+        />
+      )}
       {activeSlot === 7 && createPortal(rightHand, camera)}
     </>
   );

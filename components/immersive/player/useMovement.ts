@@ -8,7 +8,7 @@ import { PLAYER_SPEED, PLAYER_HEIGHT } from '@/lib/constants';
 import { useGameStore } from '@/store/useGameStore';
 import type { RefObject } from 'react';
 
-interface Keys { w: boolean; a: boolean; s: boolean; d: boolean; shift: boolean; space?: boolean; }
+import { useControls, ControlState } from './useControls';
 
 const GRAVITY = 20;
 const JUMP_FORCE = 6.5;
@@ -20,7 +20,7 @@ const JUMP_FORCE = 6.5;
  * Shift = sprint (2× speed, like Minecraft).
  * Jump logic included.
  */
-export function useMovement(keys: RefObject<Keys>) {
+export function useMovement(controls: RefObject<ControlState>) {
   const { camera } = useThree();
   const overlayOpen = useGameStore((s) => s.overlayOpen);
 
@@ -38,7 +38,7 @@ export function useMovement(keys: RefObject<Keys>) {
   ], []);
 
   useFrame((_, delta) => {
-    if (!keys.current || overlayOpen) return;
+    if (!controls.current || overlayOpen) return;
 
     // 1. Calculate X/Z WASD Movement
     dir.set(0, 0, 0);
@@ -51,15 +51,15 @@ export function useMovement(keys: RefObject<Keys>) {
       forward.normalize();
       right.copy(forward).cross(camera.up).normalize();
 
-      if (keys.current.w) dir.add(forward);
-      if (keys.current.s) dir.sub(forward);
-      if (keys.current.a) dir.sub(right);
-      if (keys.current.d) dir.add(right);
+      if (controls.current.w) dir.add(forward);
+      if (controls.current.s) dir.sub(forward);
+      if (controls.current.a) dir.sub(right);
+      if (controls.current.d) dir.add(right);
     }
 
     if (dir.length() > 0) {
       dir.normalize();
-      const speed = keys.current.shift ? PLAYER_SPEED * 1.6 : PLAYER_SPEED;
+      const speed = controls.current.shift ? PLAYER_SPEED * 1.6 : PLAYER_SPEED;
       dir.multiplyScalar(speed * delta);
     }
 
@@ -70,7 +70,7 @@ export function useMovement(keys: RefObject<Keys>) {
       velocityY.current = 0;
       camera.position.y = PLAYER_HEIGHT; // Snap to ground
       
-      if (keys.current.space) {
+      if (controls.current.space) {
         velocityY.current = JUMP_FORCE;
       }
     } else {

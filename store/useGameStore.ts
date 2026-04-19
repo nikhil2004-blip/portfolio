@@ -29,7 +29,7 @@ interface GameState {
   activeSlot: number;
   breakingSignId: string | null;
   globalGuestbookOpen: boolean;
-  isWorldReady: boolean;
+  isMobile: boolean;
   isAdminMode: boolean;
 
   // ── actions ─────────────────────────────────────
@@ -51,6 +51,7 @@ interface GameState {
   setBreakingSignId: (id: string | null) => void;
   setGlobalGuestbookOpen: (isOpen: boolean) => void;
   setIsWorldReady: (ready: boolean) => void;
+  setIsMobile: (mobile: boolean) => void;
   toggleAdminMode: () => void;
 }
 
@@ -78,7 +79,7 @@ export const useGameStore = create<GameState>()(
   activeSlot: 0,
   breakingSignId: null,
   globalGuestbookOpen: false,
-  isWorldReady: false,
+  isMobile: false,
   isAdminMode: false,
 
   setNearbyBuilding: (id) => set({ nearbyBuilding: id }),
@@ -143,6 +144,8 @@ export const useGameStore = create<GameState>()(
   setGlobalGuestbookOpen: (isOpen) => set({ globalGuestbookOpen: isOpen, overlayOpen: isOpen }),
 
   setIsWorldReady: (ready) => set({ isWorldReady: ready }),
+
+  setIsMobile: (mobile) => set({ isMobile: mobile }),
 
   toggleAdminMode: () => set((s) => ({ isAdminMode: !s.isAdminMode })),
 })));
