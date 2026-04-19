@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { subscribeWithSelector } from 'zustand/middleware';
 
 interface PendingSign {
   position: [number, number, number];
@@ -55,7 +56,8 @@ function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
-export const useGameStore = create<GameState>((set, get) => ({
+export const useGameStore = create<GameState>()(
+  subscribeWithSelector((set, get) => ({
   nearbyBuilding: null,
   activeBuilding: null,
   overlayOpen: false,
@@ -138,4 +140,4 @@ export const useGameStore = create<GameState>((set, get) => ({
   setGlobalGuestbookOpen: (isOpen) => set({ globalGuestbookOpen: isOpen, overlayOpen: isOpen }),
 
   setIsWorldReady: (ready) => set({ isWorldReady: ready }),
-}));
+})));

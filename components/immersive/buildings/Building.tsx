@@ -18,6 +18,9 @@ export function Building({ position, size, name, accentColor, id, doorSide }: Pr
   const isNight = useGameStore((s) => s.isNight);
 
   const style = (BUILDINGS.find(b => b.id === id)?.style || 'medieval') as 'medieval' | 'japanese' | 'chinese' | 'industrial';
+  const doorFace = doorSide === 'east' ? 'px' : 
+                   doorSide === 'west' ? 'nx' : 
+                   doorSide === 'south' ? 'pz' : 'nz';
 
   const stoneBrickTex = useTexture('/textures/stone_bricks.png');
   const oakPlankTex = useTexture('/textures/oak_planks.png');
@@ -90,9 +93,6 @@ export function Building({ position, size, name, accentColor, id, doorSide }: Pr
       const isCorner = isWallX && isWallZ;
 
       let isDoor = false;
-      const doorFace = doorSide === 'east' ? 'px' : 
-                       doorSide === 'west' ? 'nx' : 
-                       doorSide === 'south' ? 'pz' : 'nz';
 
       if (doorFace === 'px' && x === w - 1) {
           isDoor = Math.abs(z - cz) <= 1;
@@ -246,8 +246,6 @@ export function Building({ position, size, name, accentColor, id, doorSide }: Pr
   const awningZOffset = Math.floor(d / 2) >= 3 ? 2 : 1.5;
   const awningXOffset = Math.floor(w / 2) >= 3 ? 2 : 1.5;
   const lightH = 2; // y=2 is next to door
-
-  const doorFace = id === 'anomaly' ? 'nz' : (position[0] < 0 ? 'px' : 'nx');
 
   // Path extending to walkway
   const pathBlocks: [number, number, number][] = [];

@@ -28,6 +28,7 @@ export function OverlayPanel() {
   const panelRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [clock, setClock] = useState('');
+  const [copiedHUD, setCopiedHUD] = useState(false);
 
   // Tick clock every second
   useEffect(() => {
@@ -70,8 +71,8 @@ export function OverlayPanel() {
           transition={{ duration: 0.3 }}
           onClick={handleClose}
           onPointerDown={(e) => e.nativeEvent.stopPropagation()}
-          className="absolute inset-0 z-50 flex flex-col cursor-pointer"
-          style={{ background: 'rgba(0,0,0,0.97)' }}
+          className="fixed inset-0 z-50 flex flex-col cursor-pointer overflow-hidden"
+          style={{ background: 'rgba(0,0,0,0.97)', height: '100dvh' }}
         >
           {/* Scanline overlay */}
           <div className="absolute inset-0 pointer-events-none" style={{
@@ -80,8 +81,8 @@ export function OverlayPanel() {
           }} />
 
           {/* Corner brackets */}
-          {['top-0 left-0', 'top-0 right-0', 'bottom-0 left-0', 'bottom-0 right-0'].map((pos, i) => (
-            <div key={i} className={`absolute ${pos} w-12 h-12 pointer-events-none`} style={{ zIndex: 2 }}>
+          {['top-6 left-6', 'top-6 right-6', 'bottom-6 left-6', 'bottom-6 right-6'].map((pos, i) => (
+            <div key={i} className={`absolute ${pos} w-12 h-12 pointer-events-none`} style={{ zIndex: 10 }}>
               <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
                 {i === 0 && <><line x1="0" y1="16" x2="0" y2="0" stroke={accentColor} strokeWidth="2"/><line x1="0" y1="0" x2="16" y2="0" stroke={accentColor} strokeWidth="2"/></>}
                 {i === 1 && <><line x1="48" y1="16" x2="48" y2="0" stroke={accentColor} strokeWidth="2"/><line x1="48" y1="0" x2="32" y2="0" stroke={accentColor} strokeWidth="2"/></>}
@@ -126,17 +127,17 @@ export function OverlayPanel() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.3 }}
-            className="relative px-8 pt-6 pb-4 shrink-0 cursor-default"
+            className="relative px-8 pt-4 pb-2 shrink-0 cursor-default"
             onClick={(e) => e.stopPropagation()}
             style={{ zIndex: 3 }}
           >
-            <h1 className="font-monocraft text-3xl md:text-5xl font-bold tracking-wider" style={{ color: accentColor, textShadow: `0 0 40px ${accentColor}60` }}>
+            <h1 className="font-monocraft text-2xl md:text-4xl font-bold tracking-wider" style={{ color: accentColor, textShadow: `0 0 40px ${accentColor}40` }}>
               {meta.title}
             </h1>
-            <p className="font-monocraft text-xs tracking-widest mt-2 opacity-60 text-white">
+            <p className="font-monocraft text-[10px] tracking-widest mt-1 opacity-60 text-white">
               — {meta.subtitle}
             </p>
-            <div className="mt-3 h-px w-full" style={{ background: `linear-gradient(to right, ${accentColor}80, transparent)` }} />
+            <div className="mt-2 h-px w-full" style={{ background: `linear-gradient(to right, ${accentColor}80, transparent)` }} />
           </motion.div>
 
           {/* Scrollable content */}
@@ -167,9 +168,33 @@ export function OverlayPanel() {
             <span className="font-monocraft text-xs" style={{ color: `${accentColor}40` }}>
               RIT_CS_2026 :: CGPA_9.28 :: BUILD_PASSIONATE
             </span>
-            <span className="font-monocraft text-xs" style={{ color: `${accentColor}40` }}>
-              nikhilyadavsky2004@gmail.com
-            </span>
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                navigator.clipboard.writeText('nikhilyadavsky2004@gmail.com');
+                setCopiedHUD(true);
+                setTimeout(() => setCopiedHUD(false), 2000);
+              }}
+              className="font-monocraft text-xs relative group/hud-mail" 
+              style={{ color: `${accentColor}40` }}
+            >
+              <AnimatePresence>
+                {copiedHUD ? (
+                  <motion.span 
+                    initial={{ opacity: 0, x: 10 }} 
+                    animate={{ opacity: 1, x: 0 }} 
+                    exit={{ opacity: 0, x: -10 }}
+                    style={{ color: accentColor }}
+                  >
+                    [ ✓ EMAIL_COPIED ]
+                  </motion.span>
+                ) : (
+                  <span className="group-hover/hud-mail:opacity-100 opacity-60 transition-opacity">
+                    nikhilyadavsky2004@gmail.com
+                  </span>
+                )}
+              </AnimatePresence>
+            </button>
           </div>
         </motion.div>
       )}

@@ -35,7 +35,7 @@ next-env.d.ts
 # Agent specific
 .gemini
 .code-review-graph
-fetch_*.js
+.gemini/scratch/
 
 # Convex
 convex/_generated/

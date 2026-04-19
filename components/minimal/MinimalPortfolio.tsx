@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowUpRight,
   GitBranch,
@@ -10,7 +10,9 @@ import {
   ArrowLeft,
   Terminal,
   Cpu,
-  Layers
+  Layers,
+  Check,
+  Copy
 } from 'lucide-react';
 import { about } from '@/content/about';
 import { experience, hackathons, contact } from '@/content/experience';
@@ -109,6 +111,15 @@ const BackgroundGraphics = () => {
 export default function MinimalPortfolio() {
   const [activeSection, setActiveSection] = useState('about');
   const [mounted, setMounted] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyEmail = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!contact?.email) return;
+    navigator.clipboard.writeText(contact.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -226,7 +237,37 @@ export default function MinimalPortfolio() {
                   <div className="flex items-center gap-5 text-zinc-500">
                     <a href={contact.github} target="_blank" rel="noreferrer" className="hover:text-zinc-100 hover:scale-110 transition-all"><GitBranch size={20} /></a>
                     <a href={contact.linkedin} target="_blank" rel="noreferrer" className="hover:text-zinc-100 hover:scale-110 transition-all"><Briefcase size={20} /></a>
-                    <a href={`mailto:${contact.email}`} className="hover:text-zinc-100 hover:scale-110 transition-all"><Mail size={20} /></a>
+                    <button 
+                      onClick={handleCopyEmail}
+                      className="hover:text-zinc-100 hover:scale-110 transition-all relative group/mail"
+                      title="Copy Email"
+                    >
+                      <AnimatePresence mode="wait">
+                        {copied ? (
+                          <motion.div key="check" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }}>
+                            <Check size={20} className="text-lime-500" />
+                          </motion.div>
+                        ) : (
+                          <motion.div key="mail" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }}>
+                            <Mail size={20} />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                      
+                      {/* Tooltip */}
+                      <AnimatePresence>
+                        {copied && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: -30 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute left-1/2 -translate-x-1/2 px-2 py-1 bg-lime-500 text-zinc-950 text-[10px] font-bold uppercase tracking-tighter whitespace-nowrap pointer-events-none rounded"
+                          >
+                            Copied!
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -380,7 +421,19 @@ export default function MinimalPortfolio() {
               <div className="flex items-center gap-6 text-xs font-bold text-zinc-500 tracking-widest uppercase">
                 <a href={contact.github} className="hover:text-zinc-100 transition-colors">GitHub</a>
                 <a href={contact.linkedin} className="hover:text-zinc-100 transition-colors">LinkedIn</a>
-                <a href={`mailto:${contact.email}`} className="hover:text-zinc-100 transition-colors">Email</a>
+                <button 
+                  onClick={handleCopyEmail}
+                  className="hover:text-zinc-100 transition-colors relative group/footer-mail"
+                >
+                  {copied ? 'Email Copied!' : 'Email'}
+                  {copied && (
+                    <motion.span 
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-lime-500 rounded-full"
+                    />
+                  )}
+                </button>
               </div>
             </footer>
           </main>

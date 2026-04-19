@@ -1,12 +1,13 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useGameStore } from '@/store/useGameStore';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
 export function SignModal() {
   const { signboardOpen, setSignboardOpen, visitorId, editingSignId, pendingSign } = useGameStore();
-  const convexSigns = useQuery(api.signs.get) || [];
+  const rawConvexSigns = useQuery(api.signs.get);
+  const convexSigns = React.useMemo(() => rawConvexSigns || [], [rawConvexSigns]);
   const addSign = useMutation(api.signs.add);
   const updateSign = useMutation(api.signs.update);
   

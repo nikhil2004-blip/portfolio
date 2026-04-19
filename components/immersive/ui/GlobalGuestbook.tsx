@@ -24,16 +24,14 @@ export function GlobalGuestbook() {
       // Toggle on Ctrl + Shift + G
       if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'g') {
         e.preventDefault();
-        setGlobalGuestbookOpen((prev) => {
-          const next = !prev;
-          if (!next) {
-            setTimeout(() => {
-              const canvas = document.querySelector('canvas');
-              if (canvas) canvas.requestPointerLock();
-            }, 100);
-          }
-          return next;
-        });
+        const next = !globalGuestbookOpen;
+        setGlobalGuestbookOpen(next);
+        if (!next) {
+          setTimeout(() => {
+            const canvas = document.querySelector('canvas');
+            if (canvas) canvas.requestPointerLock();
+          }, 100);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -117,7 +115,7 @@ export function GlobalGuestbook() {
           gap: '12px'
         }} className="minecraft-scrollbar">
           {signs.length === 0 ? (
-            <div style={{ textAlign: 'center', py: '40px', color: '#666', fontFamily: 'monospace' }}>
+            <div style={{ textAlign: 'center', paddingTop: '40px', paddingBottom: '40px', color: '#666', fontFamily: 'monospace' }}>
               No messages yet. Be the first to place a sign!
             </div>
           ) : (

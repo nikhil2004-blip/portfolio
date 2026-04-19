@@ -1,6 +1,7 @@
 import { Mail, GitBranch, Briefcase, Terminal, Copy, Check } from 'lucide-react';
 import { contact } from '@/content/experience';
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props { accentColor: string; }
 
@@ -43,12 +44,16 @@ export function ContactPanel({ accentColor }: Props) {
       {/* Contact links */}
       <div className="space-y-3">
         {links.map((link) => (
-          <a
+          <div
             key={link.label}
-            href={link.href}
-            target={link.label === 'EMAIL' ? undefined : "_blank"}
-            rel="noopener noreferrer"
-            className="flex items-center justify-between border p-4 transition-all duration-200 hover:scale-[1.01] hover:opacity-80 group"
+            onClick={(e) => {
+              if (link.label === 'EMAIL') {
+                copyToClipboard(contact.email, 'email');
+              } else {
+                window.open(link.href, '_blank', 'noopener,noreferrer');
+              }
+            }}
+            className="flex items-center justify-between border p-4 transition-all duration-200 hover:scale-[1.01] hover:opacity-80 group cursor-pointer"
             style={{ borderColor: `${accentColor}25`, background: 'rgba(255,255,255,0.02)' }}
           >
             <div className="flex items-center gap-4">
@@ -62,24 +67,45 @@ export function ContactPanel({ accentColor }: Props) {
             </div>
             <div className="flex items-center gap-3">
               <span className="font-monocraft text-xs opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: accentColor }}>
-                {link.label === 'EMAIL' ? '[ SEND MAIL ✉ ]' : '[ OPEN → ]'}
+                {link.label === 'EMAIL' ? '[ CLICK TO COPY ✉ ]' : '[ OPEN → ]'}
               </span>
               {link.label === 'EMAIL' && (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    copyToClipboard(contact.email, 'email');
-                  }}
-                  className="p-2 border transition-colors hover:bg-white/10"
-                  style={{ borderColor: `${accentColor}40`, color: accentColor }}
-                  title="Copy to clipboard"
-                >
-                  {copiedId === 'email' ? <Check size={14} /> : <Copy size={14} />}
-                </button>
+                <div className="relative group/copy">
+                  <div
+                    className="p-2 border transition-all duration-200 hover:bg-white/10 active:scale-95"
+                    style={{ borderColor: `${accentColor}40`, color: accentColor }}
+                    title="Copy to clipboard"
+                  >
+                    <AnimatePresence mode="wait">
+                      {copiedId === 'email' ? (
+                        <motion.div key="check" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }}>
+                          <Check size={14} />
+                        </motion.div>
+                      ) : (
+                        <motion.div key="copy" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }}>
+                          <Copy size={14} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  <AnimatePresence>
+                    {copiedId === 'email' && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8, y: 0 }}
+                        animate={{ opacity: 1, scale: 1, y: -40 }}
+                        exit={{ opacity: 0, scale: 0.8, y: 0 }}
+                        className="absolute left-1/2 -translate-x-1/2 px-2 py-1 bg-white text-black text-[9px] font-bold uppercase tracking-tighter whitespace-nowrap pointer-events-none rounded"
+                        style={{ background: accentColor, color: '#000' }}
+                      >
+                        Copied!
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               )}
             </div>
-          </a>
+          </div>
         ))}
         {copiedId === 'email' && (
           <div className="text-center font-monocraft text-[10px] animate-bounce" style={{ color: accentColor }}>
