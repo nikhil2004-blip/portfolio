@@ -5,6 +5,11 @@ export const metadata: Metadata = {
   title: "Nikhil Kumar Yadav — Portfolio",
   description:
     "A Minecraft-inspired 3D portfolio. Walk around a pixelated village, enter buildings and discover my projects, skills & more.",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
   openGraph: {
     title: "Nikhil Kumar Yadav — Minecraft Portfolio",
     description: "Walk through my portfolio in 3D Minecraft style.",
