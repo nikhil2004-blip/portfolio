@@ -37,12 +37,11 @@ export default function ImmersiveWorld() {
   const { progress } = useProgress();
   const [canvasReady, setCanvasReady] = useState(false);
 
-  // Detect mobile device
   useEffect(() => {
     const checkMobile = () => {
-      const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-      const isSmall = window.innerWidth <= 768;
-      setIsMobile(isTouch || isSmall);
+      // Use User Agent detection to avoid triggering on desktop resize
+      const isMobileAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isMobileAgent);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
