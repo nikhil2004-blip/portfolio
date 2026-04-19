@@ -39,13 +39,18 @@ export default function ImmersiveWorld() {
 
   useEffect(() => {
     const checkMobile = () => {
-      // Robust check: Touch support AND Mobile User Agent
-      // We check this on resize still to handle switching modes, but it will exclude standard desktop browsers
+      // Very strict check to avoid desktop browsers even with touch screens
       const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
       const isMobileAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       
-      // Fixed: Only consider mobile if it's a touch device AND has a mobile user agent
-      setIsMobile(isTouch && isMobileAgent);
+      // Desktop resize on touch-enabled laptops should NOT trigger mobile UI
+      // We check for a common mobile landscape resolution threshold
+      const isMobileSize = window.innerWidth <= 1024 && window.innerHeight <= 600;
+      
+      // Also check platform if available
+      const isDesktopPlatform = /Win32|Win64|MacIntel|Linux x86_64/i.test(navigator.platform);
+
+      setIsMobile(isTouch && isMobileAgent && !isDesktopPlatform);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);

@@ -20,6 +20,13 @@ export function MobileControls({ controls }: Props) {
   // Static center (relative to base)
   const [active, setActive] = useState(false);
 
+  // Reset joystick when overlays open or mobile status changes
+  useEffect(() => {
+    if (overlayOpen || signboardOpen) {
+      handleJoystickEnd();
+    }
+  }, [overlayOpen, signboardOpen]);
+
   if (!isMobile) return null;
 
   const handleJoystickMove = (e: React.PointerEvent) => {
@@ -32,6 +39,11 @@ export function MobileControls({ controls }: Props) {
 
     const dx = e.clientX - centerX;
     const dy = e.clientY - centerY;
+    
+    // Guard against zeroed coordinates or invalid center calculation
+    if (e.clientX === 0 && e.clientY === 0) return;
+    if (rect.width === 0) return;
+
     const dist = Math.sqrt(dx * dx + dy * dy);
     const maxDist = 40;
     
@@ -75,10 +87,20 @@ export function MobileControls({ controls }: Props) {
       {/* Joystick Area */}
       <div 
         className="absolute bottom-10 left-10 w-32 h-32 pointer-events-auto flex items-center justify-center"
-        onPointerDown={(e) => { setActive(true); handleJoystickMove(e); }}
+        onPointerDown={(e) => { 
+          (e.target as HTMLElement).setPointerCapture(e.pointerId);
+          setActive(true); 
+          handleJoystickMove(e); 
+        }}
         onPointerMove={(e) => active && handleJoystickMove(e)}
-        onPointerUp={handleJoystickEnd}
-        onPointerCancel={handleJoystickEnd}
+        onPointerUp={(e) => {
+          (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+          handleJoystickEnd();
+        }}
+        onPointerCancel={(e) => {
+          (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+          handleJoystickEnd();
+        }}
       >
         {/* Virtual Joystick Visuals - Always visible but highlights when active */}
         <div 

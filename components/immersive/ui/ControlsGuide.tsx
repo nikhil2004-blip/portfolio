@@ -4,13 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/useGameStore';
 
 const CONTROLS = [
-  { key: 'W A S D',    desc: 'Move (like every game since 1996)' },
-  { key: 'Mouse',      desc: 'Look around and judge my design choices' },
-  { key: 'Shift',      desc: 'Sprint (for when HR gives you 30 seconds)' },
-  { key: 'E',          desc: 'Enter buildings to see my actual work' },
-  { key: 'ESC',        desc: 'Release your cursor from my hostage situation' },
-  { key: 'N',          desc: 'Toggle night mode (vampires not included)' },
-  { key: 'Right Click',desc: 'Place signboard and leave a message!' }
+  { key: 'W A S D',    desc: 'Move (Unchanged since 1996)' },
+  { key: 'Mouse',      desc: 'Look around and judge my life choices' },
+  { key: 'Shift',      desc: 'Sprint (For 30s HR speedruns)' },
+  { key: 'E',          desc: 'Enter my mind (or just the building)' },
+  { key: 'ESC',        desc: 'Stop holding your cursor hostage' },
+  { key: 'N',          desc: 'Toggle Night (to hide my bugs)' },
+  { key: 'Right Click',desc: 'Graffiti my world with a sign' }
 ];
 
 /**
@@ -55,26 +55,26 @@ export function ControlsGuide() {
             top: isMobile ? '50%' : '100px',
             left: isMobile ? '50%' : '24px',
             transform: isMobile ? 'translate(-50%, -50%)' : 'none',
-            background: 'rgba(0,0,0,0.9)',
-            border: '2px solid rgba(255,255,255,0.2)',
-            borderRadius: 8,
-            backdropFilter: 'blur(20px)',
-            width: isMobile ? '90%' : '320px',
+            background: 'rgba(0,0,0,0.95)',
+            border: '2px solid rgba(255,255,255,0.4)',
+            borderRadius: 0, // Brutalist: sharper corners
+            backdropFilter: 'blur(25px)',
+            width: isMobile ? '90%' : '440px', // Wider to fit on one line
             maxWidth: isMobile ? '400px' : 'none',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.8)',
+            boxShadow: '0 30px 60px rgba(0,0,0,0.9)',
           }}
         >
           <div style={{
             fontFamily: "'Press Start 2P', monospace",
-            fontSize: isMobile ? 8 : 10,
+            fontSize: isMobile ? 8 : 12,
             color: '#FFD700',
-            marginBottom: isMobile ? 12 : 20,
+            marginBottom: isMobile ? 12 : 30,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
             textAlign: 'center',
-            lineHeight: '1.6'
+            lineHeight: '1.4'
           }}>
-            Welcome to Nikhil&apos;s<br />Immersive Portfolio
+            WELCOME TO MY<br />OVERENGINEERED PORTFOLIO
           </div>
 
           <div className="w-full flex flex-col gap-4">
@@ -100,7 +100,7 @@ export function ControlsGuide() {
                 }}>
                   {key}
                 </kbd>
-                <span className="text-right flex-1" style={{ color: '#aaa', wordBreak: 'break-word' }}>{desc}</span>
+                <span className="text-right flex-1 whitespace-nowrap" style={{ color: '#aaa' }}>{desc}</span>
               </div>
             ))}
           </div>
