@@ -26,12 +26,13 @@ const BUILDING_LABELS: Record<string, { title: string; subtitle: string; color: 
 export function OverlayPanel() {
   const { overlayOpen, activeBuilding, closeBuilding } = useGameStore();
   const panelRef = useRef<HTMLDivElement>(null);
-  const [clock, setClock] = useState(() =>
-    new Date().toLocaleTimeString('en-IN', { hour12: false })
-  );
+  const [mounted, setMounted] = useState(false);
+  const [clock, setClock] = useState('');
 
   // Tick clock every second
   useEffect(() => {
+    setMounted(true);
+    setClock(new Date().toLocaleTimeString('en-IN', { hour12: false }));
     const id = setInterval(() =>
       setClock(new Date().toLocaleTimeString('en-IN', { hour12: false }))
     , 1000);
@@ -99,9 +100,13 @@ export function OverlayPanel() {
               </span>
             </div>
             <div className="flex items-center gap-6">
-              <Link href="/normal" className="font-monocraft text-[10px] opacity-40 hover:opacity-100 transition-opacity uppercase tracking-tighter" style={{ color: accentColor }}>
+              <button 
+                onClick={() => window.location.replace('/normal')}
+                className="font-monocraft text-[10px] opacity-40 hover:opacity-100 transition-opacity uppercase tracking-tighter cursor-pointer" 
+                style={{ color: accentColor, background: 'none', border: 'none' }}
+              >
                 Switch to Minimal
-              </Link>
+              </button>
               <span className="font-monocraft text-xs" style={{ color: `${accentColor}60` }}>
                 {clock}
               </span>

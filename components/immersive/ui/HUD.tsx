@@ -50,9 +50,23 @@ export function HUD() {
 
         {/* Right: ESC hint + Home + Night toggle */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <Link href="/" style={{ color: '#888', textDecoration: 'none', fontSize: 10, border: '1px solid #333', padding: '1px 6px', borderRadius: '2px' }} className="hover:text-white transition-colors">
+          <button
+            onClick={() => window.location.replace('/')}
+            style={{
+              background: 'none',
+              border: '1px solid #333',
+              padding: '1px 6px',
+              borderRadius: '2px',
+              color: '#888',
+              fontSize: 10,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              textTransform: 'uppercase'
+            }}
+            className="hover:text-white transition-colors"
+          >
             HOME
-          </Link>
+          </button>
           <button
             onClick={triggerNightMode}
             title={isNight ? 'Switch to Day' : 'Switch to Night'}

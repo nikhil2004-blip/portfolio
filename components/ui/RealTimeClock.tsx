@@ -3,12 +3,16 @@
 import React, { useState, useEffect } from 'react';
 
 export function RealTimeClock({ className }: { className?: string }) {
+  const [mounted, setMounted] = useState(false);
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
+    setMounted(true);
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  if (!mounted) return null;
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
