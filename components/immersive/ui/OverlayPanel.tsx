@@ -146,10 +146,10 @@ export function OverlayPanel() {
             onClick={(e) => e.stopPropagation()}
             style={{ zIndex: 3 }}
           >
-            <h1 className="font-monocraft text-2xl md:text-4xl font-bold tracking-wider" style={{ color: accentColor, textShadow: `0 0 40px ${accentColor}40` }}>
+            <h1 className="font-monocraft text-lg md:text-3xl font-bold tracking-wider" style={{ color: accentColor, textShadow: `0 0 40px ${accentColor}40` }}>
               {meta.title}
             </h1>
-            <p className="font-monocraft text-[10px] tracking-widest mt-1 opacity-60 text-white">
+            <p className="font-monocraft text-[8px] md:text-[10px] tracking-widest mt-1 opacity-60 text-white">
               — {meta.subtitle}
             </p>
             <div className="mt-2 h-px w-full" style={{ background: `linear-gradient(to right, ${accentColor}80, transparent)` }} />
@@ -166,8 +166,8 @@ export function OverlayPanel() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25, duration: 0.3 }}
-            className="relative flex-1 overflow-y-auto px-8 pb-8 outline-none custom-scrollbar cursor-default"
-            style={{ zIndex: 3 }}
+            className="relative flex-1 overflow-y-auto px-4 md:px-8 pb-8 outline-none custom-scrollbar cursor-default"
+            style={{ zIndex: 3, touchAction: 'pan-y' }}
           >
             {contentReady && (
               <>

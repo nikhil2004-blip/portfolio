@@ -19,12 +19,12 @@ const CONTROLS = [
 export function ControlsGuide() {
   const hasSeenTutorial = useGameStore(s => s.hasSeenTutorial);
   const markTutorialSeen = useGameStore(s => s.markTutorialSeen);
+  const isMobile = useGameStore(s => s.isMobile);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     if (!hasSeenTutorial) {
       setVisible(true);
-      // Removed auto-dismiss so it stays on the side until explicitly closed
     }
   }, [hasSeenTutorial]);
 
@@ -33,69 +33,80 @@ export function ControlsGuide() {
     markTutorialSeen();
   };
 
+  const mobileControls = [
+    { key: 'Joystick', desc: 'Move your character' },
+    { key: 'Swipe',    desc: 'Look around the world' },
+    { key: 'Jump',     desc: 'Space-tier hopping' },
+    { key: 'Interact', desc: 'Enter buildings' },
+  ];
+
+  const currentControls = isMobile ? mobileControls : CONTROLS;
+
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 20 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.3 }}
+          className="fixed z-[100] flex flex-col items-center justify-center p-6 md:p-8"
           style={{
-            position: 'fixed',
-            top: 100,
-            left: 24,
-            zIndex: 40,
-            background: 'rgba(0,0,0,0.85)',
+            top: isMobile ? '50%' : '100px',
+            left: isMobile ? '50%' : '24px',
+            transform: isMobile ? 'translate(-50%, -50%)' : 'none',
+            background: 'rgba(0,0,0,0.9)',
             border: '2px solid rgba(255,255,255,0.2)',
-            borderRadius: 6,
-            padding: '24px 24px',
-            backdropFilter: 'blur(10px)',
-            minWidth: 300,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
+            borderRadius: 8,
+            backdropFilter: 'blur(20px)',
+            width: isMobile ? '90%' : '320px',
+            maxWidth: isMobile ? '400px' : 'none',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.8)',
           }}
         >
           <div style={{
             fontFamily: "'Press Start 2P', monospace",
-            fontSize: 10,
+            fontSize: isMobile ? 8 : 10,
             color: '#FFD700',
-            marginBottom: 20,
+            marginBottom: isMobile ? 12 : 20,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
             textAlign: 'center',
-            lineHeight: '1.4'
+            lineHeight: '1.6'
           }}>
-            Welcome to Nikhil&apos;s<br />Over-Engineered Portfolio
+            Welcome to Nikhil&apos;s<br />Immersive Portfolio
           </div>
-          {CONTROLS.map(({ key, desc }) => (
-            <div
-              key={key}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                gap: 16,
-                marginBottom: 7,
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 11,
-              }}
-            >
-              <kbd style={{
-                background: 'rgba(255,255,255,0.1)',
-                border: '1px solid rgba(255,255,255,0.25)',
-                borderRadius: 2,
-                padding: '1px 6px',
-                color: '#eee',
-                fontSize: 10,
-              }}>
-                {key}
-              </kbd>
-              <span style={{ color: '#aaa' }}>{desc}</span>
-            </div>
-          ))}
+
+          <div className="w-full flex flex-col gap-3">
+            {currentControls.map(({ key, desc }) => (
+              <div
+                key={key}
+                className="flex items-center justify-between gap-4"
+                style={{
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: isMobile ? 10 : 11,
+                }}
+              >
+                <kbd style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  borderRadius: 3,
+                  padding: '2px 8px',
+                  color: '#eee',
+                  fontSize: isMobile ? 9 : 10,
+                  whiteSpace: 'nowrap'
+                }}>
+                  {key}
+                </kbd>
+                <span className="text-right flex-1 truncate" style={{ color: '#aaa' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
+
           <button
             onClick={dismiss}
             style={{
-              marginTop: 20,
+              marginTop: isMobile ? 16 : 24,
               width: '100%',
               fontFamily: "'Press Start 2P', monospace",
               fontSize: 10,
@@ -103,13 +114,12 @@ export function ControlsGuide() {
               border: '2px solid #B8860B',
               borderRadius: 4,
               color: '#000',
-              padding: '10px',
+              padding: '12px',
               cursor: 'pointer',
               textTransform: 'uppercase',
-              transition: 'transform 0.1s'
+              boxShadow: '0 4px 0 #B8860B'
             }}
-            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            className="active:translate-y-1 active:shadow-none transition-all"
           >
             I&apos;m Ready!
           </button>

@@ -13,12 +13,9 @@ import { InteractPrompt } from './InteractPrompt';
 export function HUD() {
   const nearbyBuilding = useGameStore(s => s.nearbyBuilding);
   const overlayOpen = useGameStore(s => s.overlayOpen);
-  const audioEnabled = useGameStore(s => s.audioEnabled);
-  const toggleAudio = useGameStore(s => s.toggleAudio);
   const isNight = useGameStore(s => s.isNight);
   const triggerNightMode = useGameStore(s => s.triggerNightMode);
-  const isTransitioningNight = useGameStore(s => s.isTransitioningNight);
-  const setGlobalGuestbookOpen = useGameStore(s => s.setGlobalGuestbookOpen);
+  const isMobile = useGameStore(s => s.isMobile);
 
   if (overlayOpen) return null;
 
@@ -32,7 +29,7 @@ export function HUD() {
           left: 0,
           right: 0,
           zIndex: 25,
-          padding: '8px 16px',
+          padding: isMobile ? '6px 12px' : '8px 16px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -40,7 +37,7 @@ export function HUD() {
           backdropFilter: 'blur(4px)',
           borderBottom: '1px solid rgba(255,255,255,0.06)',
           fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 11,
+          fontSize: isMobile ? 9 : 11,
           color: '#ccc',
         }}
       >
@@ -55,7 +52,7 @@ export function HUD() {
         </div>
 
         {/* Right: ESC hint + Home + Night toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 14 }}>
           <button
             onClick={() => window.location.replace('/')}
             style={{
@@ -64,7 +61,7 @@ export function HUD() {
               padding: '1px 6px',
               borderRadius: '2px',
               color: '#888',
-              fontSize: 10,
+              fontSize: isMobile ? 8 : 10,
               cursor: 'pointer',
               fontFamily: 'inherit',
               textTransform: 'uppercase'
@@ -80,16 +77,18 @@ export function HUD() {
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              fontSize: 16,
+              fontSize: isMobile ? 12 : 16,
               padding: '2px 4px',
               color: isNight ? '#E0E7FF' : '#FCD34D',
             }}
           >
             {isNight ? '🌙' : '☀️'}
           </button>
-          <span style={{ color: '#444', fontSize: 10 }}>
-            Click canvas to lock cursor
-          </span>
+          {!isMobile && (
+            <span style={{ color: '#444', fontSize: 10 }}>
+              Click canvas to lock cursor
+            </span>
+          )}
         </div>
       </div>
 

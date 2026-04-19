@@ -12,33 +12,26 @@ export function MobileControls({ controls }: Props) {
   const isMobile = useGameStore(s => s.isMobile);
   const overlayOpen = useGameStore(s => s.overlayOpen);
   const signboardOpen = useGameStore(s => s.signboardOpen);
-  const [touching, setTouching] = useState(false);
   
   // Joystick State
   const joystickBaseRef = useRef<HTMLDivElement>(null);
   const joystickHandleRef = useRef<HTMLDivElement>(null);
-  const joystickOrigin = useRef<{ x: number, y: number } | null>(null);
+  
+  // Static center (relative to base)
+  const [active, setActive] = useState(false);
 
   if (!isMobile) return null;
 
-  const handleJoystickStart = (e: React.PointerEvent) => {
-    if (overlayOpen || signboardOpen) return;
-    const { clientX: x, clientY: y } = e;
-    joystickOrigin.current = { x, y };
-    setTouching(true);
-    
-    if (joystickBaseRef.current) {
-      joystickBaseRef.current.style.display = 'block';
-      joystickBaseRef.current.style.left = `${x - 40}px`;
-      joystickBaseRef.current.style.top = `${y - 40}px`;
-    }
-  };
-
   const handleJoystickMove = (e: React.PointerEvent) => {
-    if (!joystickOrigin.current || !controls.current) return;
+    if (overlayOpen || signboardOpen || !controls.current || !joystickBaseRef.current) return;
     
-    const dx = e.clientX - joystickOrigin.current.x;
-    const dy = e.clientY - joystickOrigin.current.y;
+    // Calculate relative to the static base center
+    const rect = joystickBaseRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const dx = e.clientX - centerX;
+    const dy = e.clientY - centerY;
     const dist = Math.sqrt(dx * dx + dy * dy);
     const maxDist = 40;
     
@@ -58,15 +51,15 @@ export function MobileControls({ controls }: Props) {
     controls.current.a = lx < -threshold;
     controls.current.d = lx > threshold;
     
-    // Smooth analog values for potential use
     controls.current.joystickX = lx / maxDist;
     controls.current.joystickY = ly / maxDist;
   };
 
   const handleJoystickEnd = () => {
-    joystickOrigin.current = null;
-    setTouching(false);
-    if (joystickBaseRef.current) joystickBaseRef.current.style.display = 'none';
+    setActive(false);
+    if (joystickHandleRef.current) {
+      joystickHandleRef.current.style.transform = `translate(0px, 0px)`;
+    }
     if (controls.current) {
       controls.current.w = false;
       controls.current.s = false;
@@ -78,36 +71,36 @@ export function MobileControls({ controls }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] pointer-events-none select-none">
-      {/* Left Touch Area (Joystick) */}
+    <div className={`fixed inset-0 z-[1000] pointer-events-none select-none transition-opacity duration-300 ${overlayOpen ? 'opacity-0' : 'opacity-100'}`}>
+      {/* Joystick Area */}
       <div 
-        className="absolute bottom-0 left-0 w-1/2 h-3/4 pointer-events-auto"
-        onPointerDown={handleJoystickStart}
-        onPointerMove={handleJoystickMove}
+        className="absolute bottom-10 left-10 w-32 h-32 pointer-events-auto flex items-center justify-center"
+        onPointerDown={(e) => { setActive(true); handleJoystickMove(e); }}
+        onPointerMove={(e) => active && handleJoystickMove(e)}
         onPointerUp={handleJoystickEnd}
         onPointerCancel={handleJoystickEnd}
-      />
-
-      {/* Virtual Joystick Visuals */}
-      <div 
-        ref={joystickBaseRef}
-        className="absolute hidden w-20 h-20 bg-white/20 border-2 border-white/30 rounded-full backdrop-blur-sm"
-        style={{ touchAction: 'none' }}
       >
+        {/* Virtual Joystick Visuals - Always visible but highlights when active */}
         <div 
-          ref={joystickHandleRef}
-          className="absolute top-1/2 left-1/2 -ml-6 -mt-6 w-12 h-12 bg-white/60 rounded-full shadow-lg"
-        />
+          ref={joystickBaseRef}
+          className={`w-24 h-24 bg-white/10 border-2 border-white/20 rounded-full backdrop-blur-sm transition-colors ${active ? 'bg-white/20 border-white/40' : ''}`}
+          style={{ touchAction: 'none' }}
+        >
+          <div 
+            ref={joystickHandleRef}
+            className="absolute top-1/2 left-1/2 -ml-6 -mt-6 w-12 h-12 bg-white/40 rounded-full shadow-lg transition-transform duration-75"
+          />
+        </div>
       </div>
 
       {/* Right Side Buttons */}
-      <div className="absolute bottom-10 right-10 flex flex-col items-end gap-6 pointer-events-auto">
+      <div className="absolute bottom-10 right-10 flex items-center gap-10 pointer-events-auto">
         <button 
           onPointerDown={() => controls.current && (controls.current.space = true)}
           onPointerUp={() => controls.current && (controls.current.space = false)}
-          className="w-16 h-16 bg-white/20 border-2 border-white/40 rounded-full flex items-center justify-center active:bg-white/40 backdrop-blur-sm"
+          className="w-20 h-20 bg-white/10 border-2 border-white/20 rounded-full flex items-center justify-center active:bg-white/30 backdrop-blur-sm shadow-xl active:scale-95 transition-all"
         >
-          <span className="text-white font-bold">JUMP</span>
+          <span className="text-white font-monocraft text-[8px]">JUMP</span>
         </button>
         
         <button 
@@ -117,14 +110,11 @@ export function MobileControls({ controls }: Props) {
                state.openBuilding(state.nearbyBuilding);
             }
           }}
-          className="w-20 h-20 bg-blue-500/30 border-2 border-blue-400/50 rounded-full flex items-center justify-center active:bg-blue-400/50 backdrop-blur-sm"
+          className="w-24 h-24 bg-blue-500/20 border-2 border-blue-400/30 rounded-full flex items-center justify-center active:bg-blue-400/40 backdrop-blur-md shadow-2xl active:scale-95 transition-all"
         >
-          <span className="text-white font-bold text-xs">INTERACT</span>
+          <span className="text-white font-monocraft text-[8px]">INTERACT</span>
         </button>
       </div>
-
-      {/* Rotation Swipe Area (Right 50%) */}
-      {/* This will be handled by a global listener in MobileCameraControls later */}
     </div>
   );
 }

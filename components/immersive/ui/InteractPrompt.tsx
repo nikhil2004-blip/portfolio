@@ -12,6 +12,7 @@ import { Building } from 'lucide-react';
 export function InteractPrompt() {
   const nearbyBuilding = useGameStore(s => s.nearbyBuilding);
   const overlayOpen = useGameStore(s => s.overlayOpen);
+  const isMobile = useGameStore(s => s.isMobile);
   const [showHint, setShowHint] = useState(false);
 
   // Show the intro hint 1.5s after mount, hide after 6s
@@ -31,7 +32,7 @@ export function InteractPrompt() {
     <div
       style={{
         position: 'fixed',
-        bottom: '60px',
+        bottom: isMobile ? '120px' : '60px',
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 30,
@@ -62,26 +63,28 @@ export function InteractPrompt() {
               backdropFilter: 'blur(6px)',
             }}
           >
-            <span style={{
-              fontFamily: "'Press Start 2P', monospace",
-              fontSize: 9,
-              background: buildingMeta.accentColor,
-              color: '#000',
-              padding: '3px 8px',
-              borderRadius: 2,
-            }}>
-              E
-            </span>
+            {!isMobile && (
+              <span style={{
+                fontFamily: "'Press Start 2P', monospace",
+                fontSize: 9,
+                background: buildingMeta.accentColor,
+                color: '#000',
+                padding: '3px 8px',
+                borderRadius: 2,
+              }}>
+                E
+              </span>
+            )}
             <span style={{
               fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 11,
+              fontSize: isMobile ? 10 : 11,
               color: '#fff',
               letterSpacing: '0.05em',
             }}>
-              Enter · {buildingMeta.name}
+              {isMobile ? `Explore · ${buildingMeta.name}` : `Enter · ${buildingMeta.name}`}
             </span>
             <span style={{ fontSize: 14 }}>
-              <buildingMeta.Icon size={16} color={buildingMeta.accentColor} />
+              <buildingMeta.Icon size={isMobile ? 14 : 16} color={buildingMeta.accentColor} />
             </span>
           </motion.div>
         )}
@@ -107,23 +110,23 @@ export function InteractPrompt() {
               backdropFilter: 'blur(6px)',
             }}
           >
-            <span style={{ display: 'flex' }}><Building size={16} color="rgba(255,255,255,0.7)" /></span>
+            <span style={{ display: 'flex' }}><Building size={isMobile ? 14 : 16} color="rgba(255,255,255,0.7)" /></span>
             <span style={{
               fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 10,
+              fontSize: isMobile ? 9 : 10,
               color: 'rgba(255,255,255,0.7)',
               letterSpacing: '0.04em',
             }}>
-              Walk into a building to explore
+              {isMobile ? 'Walk into a building to explore' : 'Walk into a building to explore'}
             </span>
             <span style={{ fontSize: 12 }}>·</span>
             <span style={{
               fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 10,
+              fontSize: isMobile ? 9 : 10,
               color: 'rgba(255,255,255,0.4)',
               letterSpacing: '0.04em',
             }}>
-              WASD to move · Mouse to look
+              {isMobile ? 'Joystick to move · Swipe to look' : 'WASD to move · Mouse to look'}
             </span>
           </motion.div>
         )}

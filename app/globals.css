@@ -36,9 +36,19 @@
 
 html, body {
   width: 100%;
-  min-height: 100%;
-  overflow-x: hidden;
+  height: 100%;
+  overflow: hidden;
   background: #000;
+  /* Prevent browser-level gestures like pull-to-refresh */
+  touch-action: none;
+  position: fixed; /* Extra insurance for iOS scrolling */
+}
+
+#game-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
 }
 
 /* ─── Minecraft Crosshair ────────────────────────── */

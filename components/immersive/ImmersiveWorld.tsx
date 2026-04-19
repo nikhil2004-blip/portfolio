@@ -39,9 +39,13 @@ export default function ImmersiveWorld() {
 
   useEffect(() => {
     const checkMobile = () => {
-      // Use User Agent detection to avoid triggering on desktop resize
+      // Robust check: Touch support AND Mobile User Agent
+      // We check this on resize still to handle switching modes, but it will exclude standard desktop browsers
+      const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
       const isMobileAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      setIsMobile(isMobileAgent);
+      
+      // Fixed: Only consider mobile if it's a touch device AND has a mobile user agent
+      setIsMobile(isTouch && isMobileAgent);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -139,6 +143,18 @@ export default function ImmersiveWorld() {
       {!isWorldReady && (
         <div className="md:hidden fixed bottom-4 left-4 right-4 bg-black/80 text-white p-4 rounded text-xs text-center z-[100] font-monocraft">
           Loading mobile experience...
+        </div>
+      )}
+      {/* Orientation Guard for Mobile */}
+      {isMobile && (
+        <div className="fixed inset-0 z-[10000] bg-black flex flex-col items-center justify-center text-center p-10 md:hidden portrait:flex landscape:hidden">
+          <div className="w-20 h-20 mb-6 border-2 border-white/20 rounded-xl flex items-center justify-center animate-pulse">
+            <span className="text-4xl">📱</span>
+          </div>
+          <h2 className="font-monocraft text-lg text-white mb-2">LANDSCAPE MODE REQUIRED</h2>
+          <p className="font-monocraft text-[10px] text-white/50 leading-loose">
+            Please rotate your device to begin the immersive experience.
+          </p>
         </div>
       )}
     </div>
