@@ -58,11 +58,20 @@ export function useKeyboard() {
       if (e.code === 'Space')     keys.current.space = false;
     };
 
+    const clearKeys = () => {
+      keys.current = { ...INITIAL };
+    };
+
     window.addEventListener('keydown', onDown);
     window.addEventListener('keyup',   onUp);
+    window.addEventListener('blur', clearKeys);
+    document.addEventListener('pointerlockchange', clearKeys);
+    
     return () => {
       window.removeEventListener('keydown', onDown);
       window.removeEventListener('keyup',   onUp);
+      window.removeEventListener('blur', clearKeys);
+      document.removeEventListener('pointerlockchange', clearKeys);
       unsubscribe();
     };
   }, []);
