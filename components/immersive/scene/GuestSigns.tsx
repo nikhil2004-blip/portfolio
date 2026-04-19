@@ -109,9 +109,9 @@ export function GuestSigns() {
   
   const convexSigns = useMemo(() => {
     if (!rawSigns) return [];
-    // Only show signs if Admin Mode is ON or if the sign belongs to the current visitor
-    return rawSigns.filter(s => isAdminMode || s.uid === visitorId);
-  }, [rawSigns, isAdminMode, visitorId]);
+    // 3D signs are ALWAYS private - nobody sees others' signs on the ground, even admin
+    return rawSigns.filter(s => s.uid === visitorId);
+  }, [rawSigns, visitorId]);
 
   return (
     <group>

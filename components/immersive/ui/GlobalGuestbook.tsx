@@ -2,16 +2,44 @@
 import { useGameStore } from '@/store/useGameStore';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 
 export function GlobalGuestbook() {
-  const { globalGuestbookOpen, setGlobalGuestbookOpen } = useGameStore();
-  const signs = useQuery(api.signs.get) || [];
+  const { 
+    globalGuestbookOpen, 
+    setGlobalGuestbookOpen, 
+    visitorId, 
+    isAdminMode, 
+    toggleAdminMode 
+  } = useGameStore();
+  
+  const allSigns = useQuery(api.signs.get) || [];
+  
+  const filteredSigns = useMemo(() => {
+    // If Admin Mode is ON, show everything in the list. Otherwise, just your own.
+    if (isAdminMode) return allSigns;
+    return allSigns.filter(s => s.uid === visitorId);
+  }, [allSigns, isAdminMode, visitorId]);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Close on ESC, Open on Secret Combo (Ctrl+Shift+G)
+  // Keyboard Shortcuts (Universal)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Secret Admin Mode Toggle (Ctrl + Shift + G)
+      if (e.ctrlKey && e.shiftKey && e.key === 'G') {
+        e.preventDefault();
+        toggleAdminMode();
+        // Feedback via console or subtle UI could go here if needed
+        console.log('Admin Mode:', !isAdminMode ? 'ENABLED' : 'DISABLED');
+        
+        // Auto-open guestbook if toggle worked and it wasn't open
+        if (!globalGuestbookOpen) {
+          setGlobalGuestbookOpen(true);
+        }
+        return;
+      }
+
       // Close on ESC
       if (e.key === 'Escape' && globalGuestbookOpen) {
         setGlobalGuestbookOpen(false);
@@ -20,23 +48,11 @@ export function GlobalGuestbook() {
           if (canvas) canvas.requestPointerLock();
         }, 100);
       }
-      
-      // Toggle on Ctrl + Shift + G
-      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'g') {
-        e.preventDefault();
-        const next = !globalGuestbookOpen;
-        setGlobalGuestbookOpen(next);
-        if (!next) {
-          setTimeout(() => {
-            const canvas = document.querySelector('canvas');
-            if (canvas) canvas.requestPointerLock();
-          }, 100);
-        }
-      }
     };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [globalGuestbookOpen, setGlobalGuestbookOpen]);
+  }, [globalGuestbookOpen, setGlobalGuestbookOpen, isAdminMode, toggleAdminMode]);
 
   if (!globalGuestbookOpen) return null;
 
@@ -92,7 +108,7 @@ export function GlobalGuestbook() {
             textShadow: '2px 2px #FFF',
             margin: 0
           }}>
-            Global Guestbook
+            {isAdminMode ? 'Admin View: All Messages' : 'Your Sign Records'}
           </h2>
           <p style={{
             fontFamily: 'monospace',
@@ -100,7 +116,7 @@ export function GlobalGuestbook() {
             fontSize: '12px',
             marginTop: '4px'
           }}>
-            {signs.length} Total Messages
+            {filteredSigns.length} {isAdminMode ? 'Total' : 'Personal'} Messages
           </p>
         </div>
 
@@ -114,18 +130,18 @@ export function GlobalGuestbook() {
           flexDirection: 'column',
           gap: '12px'
         }} className="minecraft-scrollbar">
-          {signs.length === 0 ? (
+          {filteredSigns.length === 0 ? (
             <div style={{ textAlign: 'center', paddingTop: '40px', paddingBottom: '40px', color: '#666', fontFamily: 'monospace' }}>
-              No messages yet. Be the first to place a sign!
+              {isAdminMode ? 'No messages in database.' : 'You haven\'t placed any signs yet.'}
             </div>
           ) : (
-            [...signs].reverse().map((sign) => (
+            [...filteredSigns].reverse().map((sign) => (
               <div
                 key={sign._id}
                 style={{
-                  background: '#8B8B8B',
+                  background: sign.uid === visitorId ? '#81AB4E' : '#8B8B8B',
                   border: '2px solid #000',
-                  boxShadow: 'inset -2px -2px #555, inset 2px 2px #AAA',
+                  boxShadow: 'inset -2px -2px rgba(0,0,0,0.2), inset 2px 2px rgba(255,255,255,0.2)',
                   padding: '12px',
                   display: 'flex',
                   flexDirection: 'column',
@@ -143,11 +159,11 @@ export function GlobalGuestbook() {
                     fontSize: '14px',
                     textShadow: '1px 1px #000'
                   }}>
-                    {sign.name || 'Anonymous'}
+                    {sign.name || 'Anonymous'} {sign.uid === visitorId && '(You)'}
                   </span>
                   <span style={{
                     fontFamily: 'monospace',
-                    color: '#CCC',
+                    color: '#EEE',
                     fontSize: '10px'
                   }}>
                     {sign.placedAt ? new Date(sign.placedAt).toLocaleDateString() : 'Unknown'}
@@ -155,7 +171,7 @@ export function GlobalGuestbook() {
                 </div>
                 <p style={{
                   fontFamily: 'monospace',
-                  color: '#EEE',
+                  color: '#FFF',
                   fontSize: '13px',
                   margin: 0,
                   wordBreak: 'break-word',
@@ -168,37 +184,37 @@ export function GlobalGuestbook() {
           )}
         </div>
 
-        <button
-          onClick={() => {
-            setGlobalGuestbookOpen(false);
-            setTimeout(() => {
-              const canvas = document.querySelector('canvas');
-              if (canvas) canvas.requestPointerLock();
-            }, 100);
-          }}
-          style={{
-            marginTop: '20px',
-            background: '#C6C6C6',
-            border: '2px solid #000',
-            boxShadow: 'inset -2px -2px #555, inset 2px 2px #FFF',
-            padding: '10px 20px',
-            fontFamily: "'Monocraft', monospace",
-            fontSize: '14px',
-            cursor: 'pointer',
-            alignSelf: 'center',
-            color: '#3F3F3F'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#D6D6D6';
-            e.currentTarget.style.color = '#000';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = '#C6C6C6';
-            e.currentTarget.style.color = '#3F3F3F';
-          }}
-        >
-          BACK TO WORLD
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '20px' }}>
+          <button
+            onClick={() => {
+              setGlobalGuestbookOpen(false);
+              setTimeout(() => {
+                const canvas = document.querySelector('canvas');
+                if (canvas) canvas.requestPointerLock();
+              }, 100);
+            }}
+            style={{
+              background: '#C6C6C6',
+              border: '2px solid #000',
+              boxShadow: 'inset -2px -2px #555, inset 2px 2px #FFF',
+              padding: '10px 20px',
+              fontFamily: "'Monocraft', monospace",
+              fontSize: '14px',
+              cursor: 'pointer',
+              color: '#3F3F3F'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#81AB4E';
+              e.currentTarget.style.color = '#FFF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#C6C6C6';
+              e.currentTarget.style.color = '#3F3F3F';
+            }}
+          >
+            BACK TO WORLD
+          </button>
+        </div>
 
         <style jsx>{`
           .minecraft-scrollbar::-webkit-scrollbar {
@@ -211,7 +227,7 @@ export function GlobalGuestbook() {
           .minecraft-scrollbar::-webkit-scrollbar-thumb {
             background: #C6C6C6;
             border: 2px solid #000;
-            boxShadow: inset -2px -2px #555, inset 2px 2px #FFF;
+            box-shadow: inset -2px -2px #555, inset 2px 2px #FFF;
           }
         `}</style>
       </div>

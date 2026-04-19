@@ -24,7 +24,7 @@ export function Player() {
 
   const { 
     nearbyBuilding, overlayOpen, openBuilding, closeBuilding, activeSlot, 
-    globalGuestbookOpen, signboardOpen, isAdminMode, toggleAdminMode 
+    globalGuestbookOpen, signboardOpen 
   } = useGameStore();
 
   // Set spawn position only once when first loading
@@ -84,18 +84,10 @@ export function Player() {
       if (e.code === 'KeyN' && !overlayOpen && !useGameStore.getState().signboardOpen) {
         useGameStore.getState().triggerNightMode();
       }
-
-      // Secret admin shortcut: Ctrl + Shift + G
-      if (e.ctrlKey && e.shiftKey && e.code === 'KeyG') {
-        e.preventDefault();
-        if (!overlayOpen) {
-          toggleAdminMode();
-        }
-      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [nearbyBuilding, overlayOpen, openBuilding, closeBuilding, requestLock, releaseLock, toggleAdminMode]);
+  }, [nearbyBuilding, overlayOpen, openBuilding, closeBuilding, requestLock, releaseLock]);
 
   // When overlay opens, always release the lock; when it closes, re-acquire
   useEffect(() => {
