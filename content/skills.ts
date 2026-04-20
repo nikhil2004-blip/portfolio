@@ -4,10 +4,10 @@ export const skills: Record<string, string[]> = {
   'Backend':           ['Node.js', 'Express.js', 'Firebase', 'Firestore', 'Convex', 'REST APIs', 'WebSockets'],
   'Database':          ['SQLite', 'MongoDB', 'PostgreSQL', 'Cloud Firestore', 'Convex DB'],
   'DevOps & Hosting':  ['Vercel', 'Git', 'GitHub', 'Linux', 'WSL', 'CI/CD pipelines'],
-  'AI / ML':           ['Gemini API', 'NLP Pipelines', 'Scikit-learn', 'Prompt Engineering'],
+  'AI / ML':           ['NLP Pipelines', 'Scikit-learn', 'Prompt Engineering'],
   'Game & 3D':         ['Godot Engine', 'GDExtension', 'Three.js / R3F', 'WebGL', 'Voxel / Minecraft World-gen'],
   'Design & Creative': ['Figma', 'Canva', 'Cursor (AI Editor)', 'CapCut', 'VN Video Editor', 'PicsArt'],
-  'Currently Leveling': ['Machine Learning (the proper kind)', 'Systems Programming', 'Rust', 'Embedded / GDExtension on Android'],
+  'Currently Leveling': ['Systems Programming', 'Embedded / GDExtension on Android'],
 };
 
 export const toolsShowcase: { name: string; icon: string; desc: string; category?: string }[] = [

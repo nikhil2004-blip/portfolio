@@ -39,7 +39,7 @@ export const about = {
     '📡 IEEE RIT — Coverage & Computer Society Member',
   ],
   currentlyBuilding: 'This 3D Minecraft portfolio (meta, I know). Also exploring ML pipelines and 3D web rendering.',
-  currentlyLearning: 'Machine Learning, 3D graphics (WebGL/Three.js), and how to explain what GDExtension is to non-Godot people.',
+  currentlyLearning: '3D graphics (WebGL/Three.js), and how to explain what GDExtension is to non-Godot people.',
   funFacts: [
     '⚡ Has played every GTA title. Still has opinions on GTA IV physics.',
     '🔩 Will disassemble any device once. For science.',
