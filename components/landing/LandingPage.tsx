@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowUpRight, GitBranch, Briefcase, Mail, Check } from 'lucide-react';
@@ -120,23 +120,35 @@ export default function LandingPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Mouse tracking for the radial grid spotlight
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Smooth out the mouse movement
+  const springConfig = { damping: 25, stiffness: 150 };
+  const mouseXSpring = useSpring(mouseX, springConfig);
+  const mouseYSpring = useSpring(mouseY, springConfig);
+
+  const backgroundGlow = useMotionTemplate`radial-gradient(
+    600px circle at ${mouseXSpring}px ${mouseYSpring}px,
+    rgba(212, 255, 0, 0.15) 0%,
+    transparent 80%
+  )`;
+
   useEffect(() => {
     setMounted(true);
-    const container = containerRef.current;
-    if (!container) return;
+    
+    // Set initial position to center of screen
+    mouseX.set(window.innerWidth / 2);
+    mouseY.set(window.innerHeight / 2);
 
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      container.style.setProperty('--mouse-x', `${x}px`);
-      container.style.setProperty('--mouse-y', `${y}px`);
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [mouseX, mouseY]);
 
   if (!mounted) return null;
 
@@ -146,15 +158,25 @@ export default function LandingPage() {
       className="relative min-h-screen w-full bg-[#050505] text-zinc-300 font-sans selection:bg-[#D4FF00] selection:text-black overflow-x-hidden"
     >
       {/* INTERACTIVE BACKGROUND */}
-      <div
-        className="fixed inset-0 z-0 opacity-40 pointer-events-none transition-opacity duration-300"
-        style={{
-          backgroundImage: `radial-gradient(circle at var(--mouse-x, 50vw) var(--mouse-y, 50vh), rgba(212, 255, 0, 0.15) 0%, transparent 25%),
-                            linear-gradient(to right, #1a1a1a 1px, transparent 1px),
-                            linear-gradient(to bottom, #1a1a1a 1px, transparent 1px)`,
-          backgroundSize: '100% 100%, 40px 40px, 40px 40px'
-        }}
-      />
+      <div className="fixed inset-0 z-0 opacity-40 pointer-events-none">
+        {/* Static Grid Lines */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(to right, #1a1a1a 1px, transparent 1px),
+                              linear-gradient(to bottom, #1a1a1a 1px, transparent 1px)`,
+            backgroundSize: '40px 40px'
+          }}
+        />
+        
+        {/* Dynamic Glow Spotlight */}
+        <motion.div
+          className="absolute inset-0 transition-opacity duration-300"
+          style={{
+            background: backgroundGlow
+          }}
+        />
+      </div>
 
       {/* Ambient noise overlay */}
       <div className="absolute inset-0 z-0 opacity-[0.15] mix-blend-overlay pointer-events-none" style={{ backgroundImage: 'url("/noise.svg")' }}></div>
