@@ -42,7 +42,7 @@ export function Inventory() {
         imageRendering: 'pixelated',
       }}
     >
-      {/* Decorative blocks — visual only */}
+      {/* Decorative blocks - visual only */}
       {BLOCKS.map((block, i) => {
         const isActive = activeSlot === i;
         return (
@@ -127,7 +127,7 @@ export function Inventory() {
           boxShadow: canPlace ? '0 0 8px rgba(255,180,80,0.3)' : 'none',
         }}
       >
-        {/* Sign icon — simple SVG */}
+        {/* Sign icon - simple SVG */}
         <svg width="22" height="18" viewBox="0 0 22 18" fill="none" style={{ flexShrink: 0 }}>
           {/* Post */}
           <rect x="10" y="10" width="2" height="8" fill={canPlace ? '#A0622A' : '#555'} />

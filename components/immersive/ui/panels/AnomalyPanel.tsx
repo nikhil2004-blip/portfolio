@@ -24,12 +24,12 @@ const HIDDEN_STATS = [
 
 const FAKE_LOGS = [
   '[WARN] Ambition exceeds roadmap capacity.',
-  '[ERR]  node_modules too heavy — universe collapsed.',
+  '[ERR]  node_modules too heavy - universe collapsed.',
   '[INFO] Deadlines: acknowledged. Sleep: sacrificed.',
   '[ERR]  CSS not centering. Have tried everything.',
   '[OK]   Red Bull reserves: nominal.',
   '[WARN] Impostor syndrome daemon: running.',
-  '[INFO] git push —force: executed. Praying.',
+  '[INFO] git push -force: executed. Praying.',
   '[ERR]  Works on my machine. Shipping anyway.',
   '[INFO] Stack: "modern". Translation: it deps on deps.',
   '[OK]   Side project count: exceeds safe threshold.',

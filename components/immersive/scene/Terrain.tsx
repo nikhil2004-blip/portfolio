@@ -4,7 +4,7 @@ import { useTexture } from '@react-three/drei';
 import { InstancedMesh, Object3D, NearestFilter } from 'three';
 
 /**
- * Terrain — A flat 100x100 grid of 1x1x1 grass and path voxels.
+ * Terrain - A flat 100x100 grid of 1x1x1 grass and path voxels.
  * NearestFilter is strictly applied for the pixelated Minecraft look.
  */
 export function Terrain() {

@@ -14,7 +14,7 @@ const GRAVITY = 20;
 const JUMP_FORCE = 6.5;
 
 /**
- * useMovement — runs every frame inside useFrame.
+ * useMovement - runs every frame inside useFrame.
  * Moves camera relative to its yaw (Y rotation) so WASD
  * always goes forward/back/left/right relative to mouse look direction!
  * Shift = sprint (2× speed, like Minecraft).

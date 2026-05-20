@@ -5,7 +5,7 @@ import { Crosshair } from './Crosshair';
 import { InteractPrompt } from './InteractPrompt';
 
 /**
- * HUD — the always-visible in-world overlay.
+ * HUD - the always-visible in-world overlay.
  * Top bar: location + mute + ESC hint.
  * Center: crosshair.
  * Bottom: interact prompt (conditional).

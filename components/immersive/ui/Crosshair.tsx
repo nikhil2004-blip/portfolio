@@ -2,7 +2,7 @@
 import { useGameStore } from '@/store/useGameStore';
 
 /**
- * Crosshair — Minecraft-style white cross with center gap.
+ * Crosshair - Minecraft-style white cross with center gap.
  * Turns yellow-green when near an interactive building.
  */
 export function Crosshair() {

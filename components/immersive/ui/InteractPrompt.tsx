@@ -6,8 +6,8 @@ import { BUILDINGS } from '../buildings/buildings.data';
 import { Building } from 'lucide-react';
 
 /**
- * InteractPrompt — shows "walk into a building to explore" at start,
- * then switches to "[ E ] Enter — Building Name" when near a building.
+ * InteractPrompt - shows "walk into a building to explore" at start,
+ * then switches to "[ E ] Enter - Building Name" when near a building.
  */
 export function InteractPrompt() {
   const nearbyBuilding = useGameStore(s => s.nearbyBuilding);
@@ -90,7 +90,7 @@ export function InteractPrompt() {
         )}
       </AnimatePresence>
 
-      {/* Intro hint — shown once on load */}
+      {/* Intro hint - shown once on load */}
       <AnimatePresence>
         {showHint && !nearbyBuilding && (
           <motion.div

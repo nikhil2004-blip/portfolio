@@ -14,7 +14,7 @@ const CONTROLS = [
 ];
 
 /**
- * ControlsGuide — shown for 5 seconds on first visit.
+ * ControlsGuide - shown for 5 seconds on first visit.
  */
 export function ControlsGuide() {
   const hasSeenTutorial = useGameStore(s => s.hasSeenTutorial);

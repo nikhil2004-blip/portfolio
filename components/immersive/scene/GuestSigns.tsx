@@ -69,7 +69,7 @@ function SignItem({ sign, breakingSignId }: { sign: any; breakingSignId: string 
           textAlign="right"
           anchorY="bottom"
         >
-          {`— ${sign.name || 'Anonymous'}`}
+          {`- ${sign.name || 'Anonymous'}`}
         </Text>
 
         {/* Back Text */}
@@ -94,7 +94,7 @@ function SignItem({ sign, breakingSignId }: { sign: any; breakingSignId: string 
           textAlign="right"
           anchorY="bottom"
         >
-          {`— ${sign.name || 'Anonymous'}`}
+          {`- ${sign.name || 'Anonymous'}`}
         </Text>
       </group>
     </group>

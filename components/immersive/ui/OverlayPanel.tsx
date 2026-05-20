@@ -150,7 +150,7 @@ export function OverlayPanel() {
               {meta.title}
             </h1>
             <p className="font-monocraft text-[8px] md:text-[10px] tracking-widest mt-1 opacity-60 text-white">
-              — {meta.subtitle}
+              - {meta.subtitle}
             </p>
             <div className="mt-2 h-px w-full" style={{ background: `linear-gradient(to right, ${accentColor}80, transparent)` }} />
           </motion.div>

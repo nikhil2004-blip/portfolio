@@ -15,7 +15,7 @@ export function ToolsPanel({ accentColor }: Props) {
   return (
     <div className="text-white space-y-6 py-4">
       <p className="text-gray-400 text-sm border-l-2 pl-4" style={{ borderColor: `${accentColor}60` }}>
-        Every craftsman has a preferred set of tools. These are mine — some by choice, one or two by circumstance (looking at you, Android Studio).
+        Every craftsman has a preferred set of tools. These are mine - some by choice, one or two by circumstance (looking at you, Android Studio).
       </p>
 
       {categories.map((cat) => {
@@ -54,7 +54,7 @@ export function ToolsPanel({ accentColor }: Props) {
         <div className="font-monocraft text-xs mb-2" style={{ color: accentColor }}>WORKSPACE_CONFIG</div>
         <div className="text-gray-500 text-xs space-y-1 font-monocraft">
           <div>OS: Windows (with WSL for when it matters)</div>
-          <div>Editor: Cursor (AI-first) + VS Code — combined: 47 extensions, 1 survivor</div>
+          <div>Editor: Cursor (AI-first) + VS Code - combined: 47 extensions, 1 survivor</div>
           <div>Terminal: PowerShell (reluctantly) / Zsh (respectfully)</div>
           <div>Music while coding: Lo-fi / Phonk / Silence (rare)</div>
           <div>Debug strategy: rubber duck → Stack Overflow → actually read the docs</div>

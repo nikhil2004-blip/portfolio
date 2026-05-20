@@ -5,7 +5,7 @@ interface Props {
 }
 
 /**
- * Lighting — Minecraft-like flat lambertian shading.
+ * Lighting - Minecraft-like flat lambertian shading.
  * No shadows in v1 (expensive). AmbientLight prevents pure-black areas.
  */
 export function Lighting({ isNight }: Props) {

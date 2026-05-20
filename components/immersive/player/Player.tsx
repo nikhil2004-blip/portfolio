@@ -14,7 +14,7 @@ import { api } from '@/convex/_generated/api';
 let spawned = false;
 
 /**
- * Player — the camera controller.
+ * Player - the camera controller.
  * Must be placed INSIDE <Canvas>.
  */
 export function Player({ controls }: { controls: RefObject<ControlState> }) {
@@ -109,7 +109,7 @@ export function Player({ controls }: { controls: RefObject<ControlState> }) {
     if (overlayOpen || globalGuestbookOpen || signboardOpen) {
       releaseLock();
     }
-    // Do NOT auto-lock when closing — the ESC handler handles it,
+    // Do NOT auto-lock when closing - the ESC handler handles it,
     // and auto-enter via proximity also handles it via clicking canvas.
   }, [overlayOpen, globalGuestbookOpen, signboardOpen, releaseLock]);
 

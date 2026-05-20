@@ -37,7 +37,7 @@ export function ContactPanel({ accentColor }: Props) {
         <div className="pl-4 text-gray-600">Attempting connection...</div>
         <div className="pl-4" style={{ color: accentColor }}>✓ Host reachable. Response time: &lt; 24hrs (usually)</div>
         <div><span style={{ color: accentColor }}>$</span> whoami</div>
-        <div className="pl-4">Nikhil Kumar Yadav — CS undergrad, builder, gym-goer, GTA veteran</div>
+        <div className="pl-4">Nikhil Kumar Yadav - CS undergrad, builder, gym-goer, GTA veteran</div>
         <div><span style={{ color: accentColor }}>$</span> cat contact.json</div>
       </div>
 

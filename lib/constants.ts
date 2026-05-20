@@ -1,6 +1,6 @@
 // ─── Player physics ─────────────────────────────────
-export const PLAYER_SPEED     = 5.5;   // units/sec — exactly Minecraft walk speed feel
-export const PLAYER_HEIGHT    = 1.62;  // camera Y — Minecraft eye height
+export const PLAYER_SPEED     = 5.5;   // units/sec - exactly Minecraft walk speed feel
+export const PLAYER_HEIGHT    = 1.62;  // camera Y - Minecraft eye height
 export const PLAYER_RADIUS    = 0.35;  // collision radius
 export const INTERACTION_DIST = 4.5;   // trigger "Press E" prompt radius
 

@@ -10,7 +10,7 @@ interface Keys {
 const INITIAL: Keys = { w: false, a: false, s: false, d: false, shift: false, space: false };
 
 /**
- * useKeyboard — tracks raw key state without causing re-renders.
+ * useKeyboard - tracks raw key state without causing re-renders.
  * Uses a ref so the 3D game loop reads it every frame without
  * triggering React re-renders on every keypress.
  *

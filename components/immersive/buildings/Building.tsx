@@ -8,7 +8,7 @@ import { BUILDINGS } from './buildings.data';
 interface Props extends Pick<BuildingData, 'position' | 'size' | 'name' | 'accentColor' | 'id' | 'doorSide'> {}
 
 /**
- * Building — A procedurally generated voxel structure that changes
+ * Building - A procedurally generated voxel structure that changes
  * style (Medieval, Industrial, Japanese, Chinese) based on its data.
  */
 export function Building({ position, size, name, accentColor, id, doorSide }: Props) {
@@ -467,7 +467,7 @@ export function Building({ position, size, name, accentColor, id, doorSide }: Pr
 
       {/* ── Large Banner attached to the wall */}
       <group position={[bannerX, bannerY, bannerZ]} rotation={bannerRot}>
-        {/* Backing board — taller and wider than before */}
+        {/* Backing board - taller and wider than before */}
         <mesh position={[0, 0, 0]}>
           <boxGeometry args={[bannerWidth + 1.0, 3.2, 0.25]} />
           <meshLambertMaterial map={usePillarTex} color={pillarColor} />

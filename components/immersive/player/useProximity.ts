@@ -6,7 +6,7 @@ import { BUILDINGS } from '../buildings/buildings.data';
 import { INTERACTION_DIST } from '@/lib/constants';
 
 /**
- * useProximity — runs every frame, checks XZ distance to each building.
+ * useProximity - runs every frame, checks XZ distance to each building.
  * Updates nearbyBuilding in the Zustand store.
  * Short circuits when overlay is open.
  */

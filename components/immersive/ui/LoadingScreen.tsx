@@ -17,7 +17,7 @@ const MESSAGES = [
 import { useGameStore } from '@/store/useGameStore';
 
 /**
- * LoadingScreen — A "yellow dashboard" loading screen with funny sarcastic text
+ * LoadingScreen - A "yellow dashboard" loading screen with funny sarcastic text
  * Disappears automatically when Three.js finishes loading assets AND isWorldReady is true.
  */
 export function LoadingScreen() {

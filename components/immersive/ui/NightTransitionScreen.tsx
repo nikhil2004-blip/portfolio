@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useGameStore } from '@/store/useGameStore';
 
 /**
- * NightTransitionScreen — Renders a fullscreen black overlay with a funny message
+ * NightTransitionScreen - Renders a fullscreen black overlay with a funny message
  * when switching to night mode for the first time. This component uses a double
  * requestAnimationFrame trick to guarantee the browser actually paints the black
  * screen BEFORE we set isNight=true and WebGL starts compiling shaders (which

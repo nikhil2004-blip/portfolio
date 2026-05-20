@@ -194,7 +194,7 @@ export function SignModal() {
             fontSize: 9,
             color: 'rgba(0,0,0,0.25)',
           }}>
-            — {name || 'Anonymous'}
+            - {name || 'Anonymous'}
           </div>
         </div>
 

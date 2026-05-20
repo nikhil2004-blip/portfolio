@@ -21,7 +21,7 @@ const INITIAL: ControlState = {
 };
 
 /**
- * useControls — tracks input state (keyboard + virtual) without causing re-renders.
+ * useControls - tracks input state (keyboard + virtual) without causing re-renders.
  */
 export function useControls() {
   const controls = useRef<ControlState>({ ...INITIAL });

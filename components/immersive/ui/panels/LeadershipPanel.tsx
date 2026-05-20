@@ -136,8 +136,8 @@ export function LeadershipPanel({ accentColor }: Props) {
       <div className="border p-4" style={{ borderColor: `${accentColor}20` }}>
         <div className="font-monocraft text-xs mb-3" style={{ color: accentColor }}>COMPETITIVE_EXAMS</div>
         <div className="text-gray-400 text-sm space-y-1">
-          <p>📐 PRMO &amp; RMO — Qualified. Math olympiads. Because apparently CS wasn&apos;t enough.</p>
-          <p>🧠 NSTSE — State Rank 5. Still waiting for it to be useful.</p>
+          <p>📐 PRMO &amp; RMO - Qualified. Math olympiads. Because apparently CS wasn&apos;t enough.</p>
+          <p>🧠 NSTSE - State Rank 5. Still waiting for it to be useful.</p>
         </div>
       </div>
 
