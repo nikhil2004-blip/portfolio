@@ -1,12 +1,13 @@
 'use client';
 import { toolsShowcase } from '@/content/skills';
+import { Icon } from '@iconify/react';
 
 interface Props { accentColor: string; }
 
-const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
-  DEV:    { label: '⌨  DEV_TOOLS',       color: '#60A5FA' },
-  INFRA:  { label: '☁  BACKEND_&_HOSTING', color: '#34D399' },
-  DESIGN: { label: '🎨  DESIGN_&_MEDIA',  color: '#FB923C' },
+const CATEGORY_LABELS: Record<string, { label: string; color: string; icon: string }> = {
+  DEV:    { label: ' DEV_TOOLS',       color: '#60A5FA', icon: 'keyboard' },
+  INFRA:  { label: ' BACKEND_&_HOSTING', color: '#34D399', icon: 'server' },
+  DESIGN: { label: ' DESIGN_&_MEDIA',  color: '#FB923C', icon: 'paint-bucket' },
 };
 
 export function ToolsPanel({ accentColor }: Props) {
@@ -25,9 +26,10 @@ export function ToolsPanel({ accentColor }: Props) {
         return (
           <div key={cat}>
             <h3
-              className="font-monocraft text-xs tracking-widest mb-3"
+              className="font-monocraft text-xs tracking-widest mb-3 flex items-center gap-2"
               style={{ color: catMeta.color }}
             >
+              <Icon icon={`pixelarticons:${catMeta.icon}`} />
               {catMeta.label}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -37,7 +39,9 @@ export function ToolsPanel({ accentColor }: Props) {
                   className="border p-4 flex items-start gap-4 transition-all duration-200 hover:scale-[1.01]"
                   style={{ borderColor: `${catMeta.color}25`, background: 'rgba(255,255,255,0.02)' }}
                 >
-                  <span className="text-2xl shrink-0">{tool.icon}</span>
+                  <span className="text-2xl shrink-0">
+                    <Icon icon={`pixelarticons:${tool.icon}`} />
+                  </span>
                   <div>
                     <div className="font-monocraft text-sm font-bold" style={{ color: catMeta.color }}>{tool.name}</div>
                     <div className="text-gray-400 text-xs mt-1">{tool.desc}</div>

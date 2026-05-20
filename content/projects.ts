@@ -16,7 +16,7 @@ export const projects: Project[] = [
     description: 'End-to-end civic tech system with authentication, geotagged complaint submission, and real-time sync. AI-driven urgency classification and geospatial analytics for prioritizing which pothole gets fixed first.',
     tech: ['Flutter', 'Firebase', 'Leaflet', 'AI Prioritization', 'Firestore'],
     github: 'http://github.com/nikhil2004-blip/Nagrik-Seva-Setu',
-    badge: '🏆 SIH \'25',
+    badge: 'SIH \'25',
     stats: ['Role-based dashboard', 'AI urgency classification', 'Geo-upvoting to reduce duplicate complaints'],
   },
   {
@@ -25,7 +25,7 @@ export const projects: Project[] = [
     description: 'Built at wHACKiest 2024. Hostel management platform with expense tracking, real-time chat, academic collaboration, emergency broadcasts with device vibration, and a location-aware safety system. Tested by 30+ hostel residents who were definitely willing guinea pigs.',
     tech: ['Flutter', 'Firebase', 'Cloud Firestore', 'Real-time Chat'],
     github: 'https://github.com/nikhil2004-blip/HAW_app',
-    badge: '🥉 wHACKiest \'24 - Top 5',
+    badge: 'wHACKiest \'24 - Top 5',
     stats: ['30+ real users tested', 'Emergency broadcast + vibration alerts', 'Custom map safety zones'],
   },
   {
@@ -42,7 +42,7 @@ export const projects: Project[] = [
     description: 'High-fidelity Flutter prototype for a Bangalore commute app - built during MSRIT internship. 10+ interactive screens with simulated booking flows for cabs, autos, and metro. Includes metro maps and functional chat/call interfaces.',
     tech: ['Flutter', 'Dart', 'UI/UX Design', 'Figma'],
     github: 'https://github.com/nikhil2004-blip/BMTC_app',
-    badge: '🏢 MSRIT Intern',
+    badge: 'MSRIT Intern',
     stats: ['10+ interactive screens', 'Metro maps', 'Cab/auto/metro booking flows'],
   },
   {
@@ -51,7 +51,7 @@ export const projects: Project[] = [
     description: 'Freelance project - a courier/delivery service web application. Real client, real deadline, real money. The rite of passage.',
     tech: ['Web', 'JavaScript', 'Freelance'],
     github: 'https://github.com/nikhil2004-blip/karni_couriers',
-    badge: '💼 Freelance',
+    badge: 'Freelance',
     stats: [],
   },
   {

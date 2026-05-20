@@ -18,7 +18,7 @@ export const experience: Experience[] = [
       'Analyzed Android plugin-based loading via AndroidManifest and lifecycle integration for native libraries.',
     ],
     type: 'work',
-    badge: '🔬 Research',
+    badge: 'Research',
   },
   {
     role: 'Intern (On-site)',
@@ -30,7 +30,7 @@ export const experience: Experience[] = [
       'Integrated metro maps and functional chat/call interfaces - the full Bangalore traffic experience, now in your pocket.',
     ],
     type: 'work',
-    badge: '📱 Flutter',
+    badge: 'Flutter',
   },
   {
     role: 'Open Source Contributor',
@@ -42,7 +42,7 @@ export const experience: Experience[] = [
       'First open-source PR landed. Turns out "it works on my machine" doesn\'t fly in open source.',
     ],
     type: 'open-source',
-    badge: '🌐 OSS',
+    badge: 'OSS',
   },
 ];
 
@@ -57,7 +57,7 @@ export const hackathons: Experience[] = [
       'Firebase-backed architecture syncing app and web simultaneously.',
     ],
     type: 'hackathon',
-    badge: '🏆 SIH \'25',
+    badge: 'SIH \'25',
   },
   {
     role: 'HAW - Hostel Anarchy Wing - wHACKiest 2024',
@@ -69,10 +69,10 @@ export const hackathons: Experience[] = [
       'Location-aware safety system with custom map interface. Tested by 30+ hostel users.',
     ],
     type: 'hackathon',
-    badge: '🥈 Top 5',
+    badge: 'Top 5',
   },
   {
-    role: 'wHACKiest 2025 - 2nd Runner Up 🥉',
+    role: 'wHACKiest 2025 - 2nd Runner Up',
     org: 'MSRIT',
     period: 'Dec 2025',
     bullets: [
@@ -80,17 +80,17 @@ export const hackathons: Experience[] = [
       'The character arc is complete.',
     ],
     type: 'hackathon',
-    badge: '🥉 2nd Runner-Up',
+    badge: '2nd Runner-Up',
   },
 ];
 
 export const achievements = [
-  { label: 'IEEE RIT', desc: 'Coverage & Computer Society Member', icon: '📡' },
-  { label: 'wHACKiest \'25', desc: '2nd Runner-Up (MSRIT)', icon: '🥉' },
-  { label: 'wHACKiest \'24', desc: 'Top 5 (MSRIT)', icon: '🏆' },
-  { label: 'PRMO & RMO', desc: 'Qualified - Math olympiads, because why not.', icon: '📐' },
-  { label: 'NSTSE', desc: 'State Rank: 5', icon: '🧠' },
-  { label: 'CGPA: 9.28', desc: 'Ramaiah Institute of Technology', icon: '🎓' },
+  { label: 'IEEE RIT', desc: 'Coverage & Computer Society Member', icon: 'signal' },
+  { label: 'wHACKiest \'25', desc: '2nd Runner-Up (MSRIT)', icon: 'trophy' },
+  { label: 'wHACKiest \'24', desc: 'Top 5 (MSRIT)', icon: 'trophy' },
+  { label: 'PRMO & RMO', desc: 'Qualified - Math olympiads, because why not.', icon: 'script' },
+  { label: 'NSTSE', desc: 'State Rank: 5', icon: 'human' },
+  { label: 'CGPA: 9.28', desc: 'Ramaiah Institute of Technology', icon: 'script-text' },
 ];
 
 export const contact = {
@@ -99,5 +99,5 @@ export const contact = {
   github: 'https://github.com/nikhil2004-blip',
   linkedin: 'https://www.linkedin.com/in/nikhil-kumar-yadav-a66769327/',
   leetcode: 'https://leetcode.com/u/nikhil_kumar_yadav/',
-  status: 'Open to opportunities (and good memes) 🟢',
+  status: 'Open to opportunities (and good memes)',
 };

@@ -1,4 +1,4 @@
-import { Mail, GitBranch, Briefcase, Terminal, Copy, Check } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { contact } from '@/content/experience';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,10 +14,10 @@ export function ContactPanel({ accentColor }: Props) {
     setTimeout(() => setCopiedId(null), 2000);
   };
   const links = [
-    { label: 'EMAIL', href: `mailto:${contact.email}`, value: contact.email, Icon: Mail },
-    { label: 'GITHUB', href: contact.github, value: 'nikhil2004-blip', Icon: GitBranch },
-    { label: 'LINKEDIN', href: contact.linkedin, value: 'nikhil-kumar-yadav', Icon: Briefcase },
-    { label: 'LEETCODE', href: contact.leetcode, value: 'LeetCode Profile', Icon: Terminal },
+    { label: 'EMAIL', href: `mailto:${contact.email}`, value: contact.email, Icon: 'mail' },
+    { label: 'GITHUB', href: contact.github, value: 'nikhil2004-blip', Icon: 'git-branch' },
+    { label: 'LINKEDIN', href: contact.linkedin, value: 'nikhil-kumar-yadav', Icon: 'briefcase' },
+    { label: 'LEETCODE', href: contact.leetcode, value: 'LeetCode Profile', Icon: 'terminal' },
   ];
 
   return (
@@ -58,7 +58,7 @@ export function ContactPanel({ accentColor }: Props) {
           >
             <div className="flex items-center gap-4">
               <span className="flex items-center justify-center w-6" style={{ color: `${accentColor}80` }}>
-                <link.Icon size={18} />
+                <Icon icon={`pixelarticons:${link.Icon}`} width={18} />
               </span>
               <div>
                 <div className="font-monocraft text-xs opacity-50">{link.label}</div>
@@ -79,11 +79,11 @@ export function ContactPanel({ accentColor }: Props) {
                     <AnimatePresence mode="wait">
                       {copiedId === 'email' ? (
                         <motion.div key="check" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }}>
-                          <Check size={14} />
+                          <Icon icon="pixelarticons:check" width={14} />
                         </motion.div>
                       ) : (
                         <motion.div key="copy" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }}>
-                          <Copy size={14} />
+                          <Icon icon="pixelarticons:copy" width={14} />
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -127,7 +127,7 @@ export function ContactPanel({ accentColor }: Props) {
           style={{ borderColor: `${accentColor}40`, color: accentColor }}
           title="Copy phone number"
         >
-          {copiedId === 'phone' ? <Check size={14} /> : <Copy size={14} />}
+          {copiedId === 'phone' ? <Icon icon="pixelarticons:check" width={14} /> : <Icon icon="pixelarticons:copy" width={14} />}
         </button>
       </div>
       {copiedId === 'phone' && (

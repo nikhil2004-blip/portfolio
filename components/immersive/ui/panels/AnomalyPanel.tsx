@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { Icon } from '@iconify/react';
 
 interface Props { accentColor: string; }
 
@@ -36,12 +37,12 @@ const FAKE_LOGS = [
 ];
 
 const PERSONALITY = [
-  { icon: '🏋️', trait: 'GYM_RAT', desc: 'Lifts. Consistently. No rest day philosophy.' },
-  { icon: '🎮', trait: 'GTA_VETERAN', desc: 'Cleared every heist. Crime doesn\'t pay but XP does.' },
-  { icon: '🎵', trait: 'MUSIC_ADDICT', desc: 'Lo-fi to metal. Coding without headphones is illegal.' },
-  { icon: '🌙', trait: 'NIGHT_OWL', desc: 'Best commits after midnight. Fact.' },
-  { icon: '🍕', trait: 'PIZZA_ENJOYER', desc: 'Pineapple discourse: neutral. Cheese: mandatory.' },
-  { icon: '📚', trait: 'NEVER_STOPS_READING', desc: 'Tabs > bookmarks. Currently: 47 open.' },
+  { icon: 'human', trait: 'GYM_RAT', desc: 'Lifts. Consistently. No rest day philosophy.' },
+  { icon: 'gamepad', trait: 'GTA_VETERAN', desc: 'Cleared every heist. Crime doesn\'t pay but XP does.' },
+  { icon: 'music', trait: 'MUSIC_ADDICT', desc: 'Lo-fi to metal. Coding without headphones is illegal.' },
+  { icon: 'moon', trait: 'NIGHT_OWL', desc: 'Best commits after midnight. Fact.' },
+  { icon: 'heart', trait: 'PIZZA_ENJOYER', desc: 'Pineapple discourse: neutral. Cheese: mandatory.' },
+  { icon: 'book', trait: 'NEVER_STOPS_READING', desc: 'Tabs > bookmarks. Currently: 47 open.' },
 ];
 
 export function AnomalyPanel({ accentColor }: Props) {
@@ -172,7 +173,7 @@ export function AnomalyPanel({ accentColor }: Props) {
               className="flex items-start gap-4 border p-3"
               style={{ borderColor: `${red}15`, background: 'rgba(255,0,68,0.02)' }}
             >
-              <span className="text-xl shrink-0">{p.icon}</span>
+              <span className="text-xl shrink-0"><Icon icon={`pixelarticons:${p.icon}`} /></span>
               <div>
                 <div className="font-monocraft text-xs font-bold" style={{ color: `${red}cc` }}>
                   {p.trait}

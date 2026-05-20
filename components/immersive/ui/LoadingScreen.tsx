@@ -31,7 +31,7 @@ export function LoadingScreen() {
     MESSAGES.length - 1,
   );
 
-  const accentColor = '#00FFC8';
+  const accentColor = '#eab308';
 
   return (
     <AnimatePresence>
@@ -55,7 +55,7 @@ export function LoadingScreen() {
         >
           {/* Scanline effect */}
           <div className="absolute inset-0 pointer-events-none opacity-20" style={{
-            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,200,0.1) 2px, rgba(0,255,200,0.1) 4px)',
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(234, 179, 8,0.1) 2px, rgba(234, 179, 8,0.1) 4px)',
           }} />
 
           <div
